@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import bcrypt from 'bcrypt';
 import * as userService from '../services/user.service';
 import { User } from '../models/user.model';
+import { validatePasswordStrength, validateEmailFormat } from '../utils/validations.utils';
 
 type RegisterBody = Omit<User, 'id' | 'created_at'>;
 
@@ -14,12 +15,23 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
             return res.status(400).json({ error: "All fields are required" });
 
 
+        // Email validation
+        const emailError = validateEmailFormat(email);
+        if (emailError) {
+            return res.status(400).json({ error: emailError });
+        }
+        
         // Check if email already exists
         const existingUser = await userService.getUser(email);
         if (existingUser)
             return res.status(400).json({ error: "Email already registered" });
 
 
+        // Password strength validation
+        const passwordErrors = validatePasswordStrength(password);
+        if (passwordErrors.length > 0) {
+            return res.status(400).json({ error: passwordErrors.join('. ') });
+        }
         // Hash password with bcrypt
         const saltRounds = 7;
         const hashedPassword = await bcrypt.hash(password, saltRounds);
