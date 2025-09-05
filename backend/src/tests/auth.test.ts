@@ -1,0 +1,49 @@
+// src/tests/auth.test.ts
+import request from 'supertest';
+import app from '../app'; ; // Import the configured app
+
+describe('Auth Endpoints', () => {
+
+  // Test case for successful user registration
+  it('should register a new user successfully', async () => {
+    const response = await request(app)
+      .post('/auth/register')
+      .send({
+        name: 'Test User',
+        email: 'test' + Date.now() + '@example.com', // Use unique email for each run
+        password: 'password123',
+      });
+
+    // Assertions: Check if the test passed
+    expect(response.status).toBe(201); // 201 means "Created"
+    expect(response.body).toHaveProperty('message', 'User registered successfully');
+  });
+
+  // Test case for successful login
+  it('should log in an existing user and return a token', async () => {
+    const userEmail = 'login' + Date.now() + '@example.com';
+    const userPassword = 'password123';
+
+    // Step 1: Register a user to ensure the user exists
+    await request(app)
+      .post('/auth/register')
+      .send({
+        name: 'Login Test User',
+        email: userEmail,
+        password: userPassword,
+      });
+
+    // Step 2: Attempt to log in with the same credentials
+    const response = await request(app)
+      .post('/auth/login')
+      .send({
+        email: userEmail,
+        password: userPassword,
+      });
+
+    // Assertions
+    expect(response.status).toBe(200); // 200 means "OK"
+    expect(response.body).toHaveProperty('token'); // Check if a token is returned
+  });
+
+});
