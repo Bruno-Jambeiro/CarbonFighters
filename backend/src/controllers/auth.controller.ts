@@ -20,7 +20,7 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
         if (emailError) {
             return res.status(400).json({ error: emailError });
         }
-        
+
         // Check if email already exists
         const existingUser = await userService.getUser(email);
         if (existingUser)
@@ -30,7 +30,7 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
         // Password strength validation
         const passwordErrors = validatePasswordStrength(password);
         if (passwordErrors.length > 0) {
-            return res.status(400).json({ error: passwordErrors.join('. ') });
+            return res.status(400).json({ error: passwordErrors.join(', ') });
         }
         // Hash password with bcrypt
         const saltRounds = 7;
