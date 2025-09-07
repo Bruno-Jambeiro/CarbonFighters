@@ -55,4 +55,32 @@ describe('Register Endpoint', () => {
         });
     }
 
+    // Test case for invalid email format
+    const invalidEmails = [
+        ["plainaddress", "Invalid email format"],
+        ["@missingusername.com", "Invalid email format"],
+        ["username@.com", "Invalid email format"],
+        ["username@com", "Invalid email format"],
+        ["username@domain..com", "Invalid email format"],
+        ["username@domain,com", "Invalid email format"],
+        ["username@domain@domain.com", "Invalid email format"],
+        ["username@.domain.com", "Invalid email format"],
+        ["username@domain..com", "Invalid email format"],
+    ];
+
+    for (const [index, [email, errorMessage]] of invalidEmails.entries()) {
+        it(`Should fail for invalid email format: ${email}`, async () => {
+            const response = await request(app)
+                .post('/auth/register')
+                .send({
+                    ...exampleUser,
+                    email,
+                    password: `Strongpwd@${index}` // Ensure unique password for each test
+                });
+
+            expect(response.status).toBe(400);
+            expect(response.body).toHaveProperty('error', errorMessage);
+        });
+    }
+
 });

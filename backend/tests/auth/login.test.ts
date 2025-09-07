@@ -30,4 +30,28 @@ describe('Login Endpoint', () => {
         expect(response.status).toBe(200); // 200 means "OK"
         expect(response.body).toHaveProperty('token'); // Check if a token is returned
     });
+
+    // Test case for invalid login
+    it('should fail to log in with incorrect credentials', async () => {
+        const response = await request(app)
+            .post('/auth/login')
+            .send({
+                email: exampleUser.email,
+                password: "WrongPassword@1",
+            });
+        expect(response.status).toBe(401); // 401 means "Unauthorized"
+        expect(response.body).toHaveProperty('error', 'Invalid email or password');
+    });
+
+    // Test case for non-existent user
+    it('should fail to log in with incorrect credentials', async () => {
+        const response = await request(app)
+            .post('/auth/login')
+            .send({
+                email: "wronguser@email.com",
+                password: exampleUser.password,
+            });
+        expect(response.status).toBe(401); // 401 means "Unauthorized"
+        expect(response.body).toHaveProperty('error', 'Invalid email or password');
+    });
 });

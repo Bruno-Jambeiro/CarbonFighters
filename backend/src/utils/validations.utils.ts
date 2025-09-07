@@ -27,7 +27,8 @@ export function validateEmailFormat(email: string): string | null {
         email.startsWith('@') ||
         email.endsWith('@') ||
         email.indexOf('.') < email.indexOf('@') + 2 ||
-        email.endsWith('.')
+        email.endsWith('.') ||
+        email.includes('..')
     ) {
         return "Invalid email format";
     }
