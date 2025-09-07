@@ -15,12 +15,6 @@ export function validatePasswordStrength(password: string): string[] {
     if (!/[!@#$%^&*(),.?\":{}|<>_\-+=~`[\]\\\/]/.test(password)) {
         errors.push("Password must contain at least one special character");
     }
-    const forbiddenPasswords = [
-        'password', '12345678', 'abcdefgh', 'qwertyui', '00000000', '11111111', 'iloveyou'
-    ];
-    if (forbiddenPasswords.includes(password.toLowerCase()) || /^0+$/.test(password)) {
-        errors.push("Password is too common or insecure");
-    }
     return errors;
 }
 
@@ -33,7 +27,8 @@ export function validateEmailFormat(email: string): string | null {
         email.startsWith('@') ||
         email.endsWith('@') ||
         email.indexOf('.') < email.indexOf('@') + 2 ||
-        email.endsWith('.')
+        email.endsWith('.') ||
+        email.includes('..')
     ) {
         return "Invalid email format";
     }

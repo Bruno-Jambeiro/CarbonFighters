@@ -11,7 +11,7 @@ export async function getAllUsers(): Promise<User[]> {
 export async function getUser(email: string): Promise<User | null> {
     const db = await getDb();
     const row = await db.get<User>('SELECT * FROM users WHERE email = ?;', [email]);
-    console.log(row);
+
     return row || null;
 };
 
