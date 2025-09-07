@@ -1,7 +1,7 @@
-import Header from "./components/headers/HeaderDash";
-import Footer from "./components/footer/FooterDash";
+import Header from "../components/headers/HeaderDash";
+import Footer from "../components/footer/FooterDash";
 
-export default function Dash() {
+export default function Home() {
 return (
     <div className="w-screen h-screen flex flex-col">
     <Header />
