@@ -1,6 +1,6 @@
 // src/tests/auth.test.ts
 import request from 'supertest';
-import app from '../app'; ; // Import the configured app
+import app from '../src/app'; // Import the configured app
 
 describe('Auth Endpoints', () => {
 
@@ -9,9 +9,11 @@ describe('Auth Endpoints', () => {
     const response = await request(app)
       .post('/auth/register')
       .send({
-        name: 'Test User',
-        email: 'test' + Date.now() + '@example.com', // Use unique email for each run
-        password: 'password123',
+        full_name: "Test User",
+        email: "user@email.com",
+        phone: "+5500987654321",
+        password: "Strongpwd@1",
+        date_of_birth: "01/01/2000",
       });
 
     // Assertions: Check if the test passed
@@ -21,8 +23,8 @@ describe('Auth Endpoints', () => {
 
   // Test case for successful login
   it('should log in an existing user and return a token', async () => {
-    const userEmail = 'login' + Date.now() + '@example.com';
-    const userPassword = 'password123';
+    const userEmail = 'user@email.com';
+    const userPassword = 'Strongpwd@1';
 
     // Step 1: Register a user to ensure the user exists
     await request(app)
