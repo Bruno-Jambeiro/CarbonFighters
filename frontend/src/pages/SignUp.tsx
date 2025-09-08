@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
+import PasswordStrengthBar from '../components/passwordStrengthBar';
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -193,6 +194,7 @@ const SignUp: React.FC = () => {
               placeholder="Create a password"
               error={errors.password}
             />
+            <PasswordStrengthBar password={formData.password} />
             <FormInput
               id="confirmPassword"
               name="Confirm Password"
