@@ -1,5 +1,6 @@
 import request from 'supertest';
 import app from '../../src/app';
+import { verifyToken } from '../../src/services/token.service';
 
 describe('Register Endpoint', () => {
     let exampleUser = {
@@ -27,6 +28,10 @@ describe('Register Endpoint', () => {
         // Assertions: Check if the test passed
         expect(response.status).toBe(201); // 201 means "Created"
         expect(response.body).toHaveProperty('message', 'User registered successfully');
+        expect(response.body).toHaveProperty('token');
+
+        let token = response.body.token;
+        expect(verifyToken(token)).toHaveProperty('email', exampleUser.email);
     });
 
     it('Should not register a repeated email', async () => {
@@ -57,18 +62,18 @@ describe('Register Endpoint', () => {
 
     // Test case for invalid email format
     const invalidEmails = [
-        ["plainaddress", "Invalid email format"],
-        ["@missingusername.com", "Invalid email format"],
-        ["username@.com", "Invalid email format"],
-        ["username@com", "Invalid email format"],
-        ["username@domain..com", "Invalid email format"],
-        ["username@domain,com", "Invalid email format"],
-        ["username@domain@domain.com", "Invalid email format"],
-        ["username@.domain.com", "Invalid email format"],
-        ["username@domain..com", "Invalid email format"],
+        "plainaddress",
+        "@missingusername.com",
+        "username@.com",
+        "username@com",
+        "username@domain..com",
+        "username@domain,com",
+        "username@domain@domain.com",
+        "username@.domain.com",
+        "username@domain..com",
     ];
 
-    for (const [index, [email, errorMessage]] of invalidEmails.entries()) {
+    for (const [index, email] of invalidEmails.entries()) {
         it(`Should fail for invalid email format: ${email}`, async () => {
             const response = await request(app)
                 .post('/auth/register')
@@ -79,7 +84,7 @@ describe('Register Endpoint', () => {
                 });
 
             expect(response.status).toBe(400);
-            expect(response.body).toHaveProperty('error', errorMessage);
+            expect(response.body).toHaveProperty('error', "Invalid email format");
         });
     }
 

@@ -1,5 +1,6 @@
 import request from 'supertest';
 import app from '../../src/app';
+import { verifyToken } from '../../src/services/token.service';
 
 describe('Login Endpoint', () => {
     let exampleUser = {
@@ -13,12 +14,12 @@ describe('Login Endpoint', () => {
     // Test case for successful login
     it('should log in an existing user and return a token', async () => {
 
-        // Step 1: Register a user to ensure the user exists
+        // Register a user to ensure the user exists
         await request(app)
             .post('/auth/register')
             .send(exampleUser);
 
-        // Step 2: Attempt to log in with the same credentials
+        // Attempt to log in with the same credentials
         const response = await request(app)
             .post('/auth/login')
             .send({
@@ -27,8 +28,11 @@ describe('Login Endpoint', () => {
             });
 
         // Assertions
-        expect(response.status).toBe(200); // 200 means "OK"
-        expect(response.body).toHaveProperty('token'); // Check if a token is returned
+        expect(response.status).toBe(200);
+        expect(response.body).toHaveProperty('token');
+
+        let token = response.body.token;
+        expect(verifyToken(token)).toHaveProperty('email', exampleUser.email);
     });
 
     // Test case for invalid login
