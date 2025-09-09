@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import PasswordStrengthBar from '../components/passwordStrengthBar';
+import carbonFightersLogo from '../assets/carbonfighters.png';
 
 const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -96,7 +97,6 @@ const SignUp: React.FC = () => {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        // Backend API call
         const response = await fetch('/api/auth/register', {
           method: 'POST',
           headers: {
@@ -148,11 +148,9 @@ const SignUp: React.FC = () => {
         <div className="flex flex-col gap-8 w-full max-w-xl">
           <div className="text-center">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-10 w-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
-              </svg>
+              <img src={carbonFightersLogo} alt="Carbon Fighters Logo" />
             </div>
-            <h2 className="mb-2 text-4xl font-bold text-gray-900 leading-tight">Join CarbonFighters</h2>
+            <h2 className="mb-2 text-4xl font-bold text-gray-900 leading-tight">Join Carbon Fighters</h2>
             <p className="text-lg text-gray-500">Create your account and start making a difference</p>
           </div>
 

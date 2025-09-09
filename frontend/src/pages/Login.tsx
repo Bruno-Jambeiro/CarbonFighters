@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
+import carbonFightersLogo from '../assets/carbonfighters.png';
+
 
 const Login: React.FC = () => {
   const [formData, setFormData] = useState({
@@ -13,6 +15,8 @@ const Login: React.FC = () => {
     email: '',
     password: ''
   });
+
+  const [isLoading, setIsLoading] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -54,13 +58,30 @@ const Login: React.FC = () => {
     return isValid;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (validateForm()) {
-      // TODO: Implement actual login logic here
-      console.log('Login attempt:', formData);
-      // You would typically make an API call here
+      setIsLoading(true);
+      const response = (await fetch('http://localhost:3000/auth/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(formData),
+      }));
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('Login successful, saving token: ', data.token);
+        // Handle successful login (e.g., redirect, store token, etc.)
+      } else {
+        const errorData = await response.json();
+        console.error('Login failed: ', errorData.error);
+        // Handle login failure (e.g., show error message)
+      }
+
+      setIsLoading(false);
     }
   };
 
@@ -71,12 +92,10 @@ const Login: React.FC = () => {
         <div className="flex flex-col gap-8 w-full max-w-md">
           <div className="text-center">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-              <svg className="h-8 w-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
-              </svg>
+              <img src={carbonFightersLogo} alt="Carbon Fighters Logo" />
             </div>
             <h2 className="mb-2 text-4xl font-bold text-gray-900 leading-tight">
-              Welcome back to CarbonFighters
+              Welcome back to Carbon Fighters
             </h2>
             <p className="text-lg text-gray-500">
               Sign in to continue your environmental journey
@@ -112,7 +131,7 @@ const Login: React.FC = () => {
               <a href="#" className="text-sm font-medium text-green-500 hover:text-green-600">Forgot your password?</a>
             </div>
 
-            <FormSubmitButton>Sign In</FormSubmitButton>
+            <FormSubmitButton disabled={isLoading}>Sign In</FormSubmitButton>
 
             <div className="text-center text-gray-500 text-base">
               Don't have an account?{' '}
