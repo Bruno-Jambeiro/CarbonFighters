@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import PasswordStrengthBar from '../components/passwordStrengthBar';
+import PasswordRequirements from '../components/passwordRequeriments';
 import carbonFightersLogo from '../assets/carbonfighters.png';
 
 const SignUp: React.FC = () => {
@@ -24,6 +25,14 @@ const SignUp: React.FC = () => {
 
   const [isLoading, setIsLoading] = useState(false);
 
+  const [showRequirements, setShowRequirements] = useState(true);
+
+  const checkPasswordRequirements = (password: string) => {
+    return password.length > 0 && 
+          password.length >= 8 && 
+          /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password);
+  };
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setFormData(prev => ({
@@ -38,7 +47,22 @@ const SignUp: React.FC = () => {
         [name]: ''
       }));
     }
+
+        // NEW: Handle password requirements visibility
+    if (name === 'password') {
+      const allRequirementsMet = checkPasswordRequirements(value);
+      if (allRequirementsMet && showRequirements) {
+        // Hide requirements when password meets all criteria (with delay)
+        setTimeout(() => setShowRequirements(false), 500);
+      } else if (!allRequirementsMet && !showRequirements) {
+        // Show requirements again if password becomes invalid
+        setShowRequirements(true);
+      }
+    }
+
   };
+
+  
 
   const validateForm = () => {
     const newErrors = {
@@ -182,6 +206,11 @@ const SignUp: React.FC = () => {
               placeholder="Enter your email"
               error={errors.email}
             />
+
+            {/* Password Requirements Section */}
+            <div className="space-y-4">
+              
+
             <FormInput
               id="password"
               name="Password"
@@ -191,8 +220,16 @@ const SignUp: React.FC = () => {
               onChange={handleChange}
               placeholder="Create a password"
               error={errors.password}
-            />
-            <PasswordStrengthBar password={formData.password} />
+              />
+              <PasswordStrengthBar password={formData.password} />
+
+              {(showRequirements) && (
+                <PasswordRequirements password={formData.password} />
+              )}
+
+            </div>
+
+
             <FormInput
               id="confirmPassword"
               name="Confirm Password"
