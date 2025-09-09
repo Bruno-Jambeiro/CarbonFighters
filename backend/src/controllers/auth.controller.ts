@@ -3,6 +3,7 @@ import bcrypt from 'bcrypt';
 import * as userService from '../services/user.service';
 import { User } from '../models/user.model';
 import { validatePasswordStrength, validateEmailFormat } from '../utils/validations.utils';
+import { generateToken } from '../services/token.service';
 
 type RegisterBody = Omit<User, 'id' | 'created_at'>;
 
@@ -51,11 +52,11 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
         return res.status(201).json({
             message: "User registered successfully",
             user: {
-                full_name: newUser?.full_name,
-                email: newUser?.email,
-                created_at: newUser?.created_at,
+                full_name: newUser!.full_name,
+                email: newUser!.email,
+                created_at: newUser!.created_at,
             },
-            token: 'fake-jwt-token'
+            token: generateToken({ id: newUser!.id, email: newUser!.email }),
         });
     } catch (err) {
         console.error(err);
@@ -87,7 +88,7 @@ export async function login(req: Request, res: Response) {
         return res.status(200).json({
             message: "Login successful",
             user,
-            token: 'fake-jwt-token'
+            token: generateToken({ id: user.id, email: user.email }),
         });
     } catch (err) {
         console.error(err);
