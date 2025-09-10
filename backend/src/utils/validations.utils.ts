@@ -19,17 +19,23 @@ export function validatePasswordStrength(password: string): string[] {
 }
 
 export function validateEmailFormat(email: string): string | null {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    // Require at least one dot in the domain and a TLD of at least 2 characters
+    const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
     if (
         typeof email !== 'string' ||
         !emailRegex.test(email) ||
-        email.split('@').length !== 2 ||
         email.startsWith('@') ||
         email.endsWith('@') ||
-        email.indexOf('.') < email.indexOf('@') + 2 ||
-        email.endsWith('.') ||
-        email.includes('..')
+        email.includes('..') ||
+        email.includes(',') ||
+        email.split('@').length !== 2
     ) {
+        return "Invalid email format";
+    }
+    // Check TLD length (last part after the last dot)
+    const domainParts = email.split('@')[1].split('.');
+    const tld = domainParts[domainParts.length - 1];
+    if (tld.length < 2) {
         return "Invalid email format";
     }
     return null;
