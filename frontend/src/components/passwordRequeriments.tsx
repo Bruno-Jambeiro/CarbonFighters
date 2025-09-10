@@ -1,28 +1,24 @@
 import React from "react";
 
 interface PasswordRequirementsProps {
-    password: string;
+  password: string;
 }
 
 interface Requirement {
-    text: string;
-    test: (password: string) => boolean;
+  text: string;
+  test: (password: string) => boolean;
 }
 
 const PasswordRequirements: React.FC<PasswordRequirementsProps> = ({
-    password,}) => {
-const requirements: Requirement[] = [
-    {
-      text: "Cannot be empty",
-      test: (pwd: string) => pwd.length > 0,
-    },
+  password, }) => {
+  const requirements: Requirement[] = [
     {
       text: "At least 8 characters",
       test: (pwd: string) => pwd.length >= 8,
     },
     {
-      text: "Contains uppercase, lowercase, and number",
-      test: (pwd: string) => /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(pwd),
+      text: "Contains uppercase, lowercase, number and special character",
+      test: (pwd: string) => /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^a-zA-Z0-9])/.test(pwd),
     },
   ];
 
@@ -38,11 +34,10 @@ const requirements: Requirement[] = [
         return (
           <div key={index} className="flex items-center gap-3">
             <div
-              className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${
-                isMet
-                  ? "bg-green-500 border-green-500"
-                  : "border-gray-300 bg-white"
-              }`}
+              className={`flex-shrink-0 w-5 h-5 rounded-full border-2 flex items-center justify-center transition-all duration-200 ${isMet
+                ? "bg-green-500 border-green-500"
+                : "border-gray-300 bg-white"
+                }`}
             >
               {isMet && (
                 <svg
@@ -60,9 +55,8 @@ const requirements: Requirement[] = [
             </div>
 
             <span
-              className={`text-sm transition-colors duration-200 ${
-                isMet ? "text-green-700 font-medium" : "text-gray-600"
-              }`}
+              className={`text-sm transition-colors duration-200 ${isMet ? "text-green-700 font-medium" : "text-gray-600"
+                }`}
             >
               {requirement.text}
             </span>

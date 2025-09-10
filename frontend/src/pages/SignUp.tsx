@@ -28,9 +28,8 @@ const SignUp: React.FC = () => {
   const [showRequirements, setShowRequirements] = useState(true);
 
   const checkPasswordRequirements = (password: string) => {
-    return password.length > 0 && 
-          password.length >= 8 && 
-          /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(password);
+    return password.length >= 8 &&
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[a-zA-Z0-9])/.test(password);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -48,7 +47,7 @@ const SignUp: React.FC = () => {
       }));
     }
 
-        // NEW: Handle password requirements visibility
+    // NEW: Handle password requirements visibility
     if (name === 'password') {
       const allRequirementsMet = checkPasswordRequirements(value);
       if (allRequirementsMet && showRequirements) {
@@ -62,7 +61,7 @@ const SignUp: React.FC = () => {
 
   };
 
-  
+
 
   const validateForm = () => {
     const newErrors = {
@@ -209,17 +208,17 @@ const SignUp: React.FC = () => {
 
             {/* Password Requirements Section */}
             <div className="space-y-4">
-              
 
-            <FormInput
-              id="password"
-              name="Password"
-              type='password'
-              autoComplete='new-password'
-              value={formData.password}
-              onChange={handleChange}
-              placeholder="Create a password"
-              error={errors.password}
+
+              <FormInput
+                id="password"
+                name="Password"
+                type='password'
+                autoComplete='new-password'
+                value={formData.password}
+                onChange={handleChange}
+                placeholder="Create a password"
+                error={errors.password}
               />
               <PasswordStrengthBar password={formData.password} />
 

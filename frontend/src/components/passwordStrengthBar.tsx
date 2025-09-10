@@ -1,6 +1,6 @@
 function evaluatePasswordStrength(password: string) {
     let strength = 0;
-    if (password.length >= 6) strength++;
+    if (password.length >= 8) strength++;
     if (/[a-z]/.test(password)) strength++;
     if (/[A-Z]/.test(password)) strength++;
     if (/[0-9]/.test(password)) strength++;
