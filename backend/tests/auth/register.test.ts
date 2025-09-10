@@ -88,4 +88,36 @@ describe('Register Endpoint', () => {
         });
     }
 
+    // Test case for valid email format
+    const validEmails = [
+        "simple@example.com",
+        "user.name@example.com",
+        "user-name@example.com",
+        "user+mailbox/department=shipping@example.com",
+        "!#$%&'*+-/=?^_`{}|~@example.org",
+        "much.more.unusual@dept.example.com",
+        "user%example.com@example.org",
+        "user.name+tag+sorting@example.com",
+        "x@example.com",
+        "example-indeed@strange-example.com",
+    ];
+
+    for (const [index, email] of validEmails.entries()) {
+        it(`Should succeed for valid (even weird) email format: ${email}`, async () => {
+            const response = await request(app)
+                .post('/auth/register')
+                .send({
+                    ...exampleUser,
+                    email,
+                    password: `Strongpwd@${index + 10}` // Ensure unique password for each test
+                });
+
+            expect(response.status).toBe(201);
+            expect(response.body).toHaveProperty('message', 'User registered successfully');
+            expect(response.body).toHaveProperty('token');
+            let token = response.body.token;
+            expect(verifyToken(token)).toHaveProperty('email', email);
+        });
+    }
+
 });
