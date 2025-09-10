@@ -5,32 +5,30 @@ import FormSubmitButton from '../components/forms/formSubmitButton';
 import PasswordStrengthBar from '../components/passwordStrengthBar';
 import PasswordRequirements from '../components/passwordRequeriments';
 import carbonFightersLogo from '../assets/carbonfighters.png';
+import { validateDate, validateEmailFormat, validatePasswordStrength } from '../utils/validations.utils';
 
-const SignUp: React.FC = () => {
+export default function SignUp() {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
+    date_of_birth: '',
     password: '',
     confirmPassword: ''
   });
-
   const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
     email: '',
+    phone: '',
+    date_of_birth: '',
     password: '',
     confirmPassword: ''
   });
-
   const [isLoading, setIsLoading] = useState(false);
-
   const [showRequirements, setShowRequirements] = useState(true);
 
-  const checkPasswordRequirements = (password: string) => {
-    return password.length >= 8 &&
-      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[a-zA-Z0-9])/.test(password);
-  };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -47,9 +45,9 @@ const SignUp: React.FC = () => {
       }));
     }
 
-    // NEW: Handle password requirements visibility
+    // Handle password requirements visibility
     if (name === 'password') {
-      const allRequirementsMet = checkPasswordRequirements(value);
+      const allRequirementsMet = validatePasswordStrength(value).length === 0;
       if (allRequirementsMet && showRequirements) {
         // Hide requirements when password meets all criteria (with delay)
         setTimeout(() => setShowRequirements(false), 500);
@@ -61,13 +59,13 @@ const SignUp: React.FC = () => {
 
   };
 
-
-
   const validateForm = () => {
     const newErrors = {
       firstName: '',
       lastName: '',
       email: '',
+      phone: '',
+      date_of_birth: '',
       password: '',
       confirmPassword: ''
     };
@@ -86,19 +84,29 @@ const SignUp: React.FC = () => {
     if (!formData.email) {
       newErrors.email = 'Email is required';
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    } else {
+      let error = validateEmailFormat(formData.email)
+      if (error !== null) {
+        newErrors.email = error;
+        isValid = false;
+      }
+    }
+
+    if (formData.phone.replace(/\D/g, '').length !== 11) {
+      newErrors.phone = "Enter a valid phone number (00) 00000-0000";
+
       isValid = false;
     }
 
-    if (!formData.password) {
-      newErrors.password = 'Password is required';
+    let dateValidation = validateDate(formData.date_of_birth)
+    if (dateValidation !== null) {
+      newErrors.date_of_birth = dateValidation
       isValid = false;
-    } else if (formData.password.length < 8) {
-      newErrors.password = 'Password must be at least 8 characters';
-      isValid = false;
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+    }
+
+    let pwdValidation = validatePasswordStrength(formData.password)
+    if (pwdValidation.length > 0) {
+      newErrors.password = pwdValidation.join(', ')
       isValid = false;
     }
 
@@ -145,6 +153,8 @@ const SignUp: React.FC = () => {
             firstName: '',
             lastName: '',
             email: errorData.message || 'Registration failed',
+            phone: '',
+            date_of_birth: '',
             password: '',
             confirmPassword: ''
           });
@@ -155,6 +165,8 @@ const SignUp: React.FC = () => {
           firstName: '',
           lastName: '',
           email: 'Network error. Please try again.',
+          phone: '',
+          date_of_birth: '',
           password: '',
           confirmPassword: ''
         });
@@ -165,10 +177,10 @@ const SignUp: React.FC = () => {
   };
 
   return (
-    <div className="flex h-screen w-screen overflow-hidden bg-gradient-to-br from-green-50 to-blue-100 lg:flex-row flex-col">
+    <div className="flex h-screen w-screen bg-gradient-to-br from-green-50 to-blue-100 lg:flex-row flex-col">
       {/* Left side - Sign Up Form */}
-      <div className="flex items-center justify-center p-8 overflow-y-auto lg:w-1/2 w-full h-full">
-        <div className="flex flex-col gap-8 w-full max-w-xl">
+      <div className="h-screen p-8 overflow-y-auto lg:w-1/2 w-full">
+        <div className="flex flex-col items-center justify-center gap-8 min-w-full max-w-xl">
           <div className="text-center">
             <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
               <img src={carbonFightersLogo} alt="Carbon Fighters Logo" />
@@ -205,6 +217,38 @@ const SignUp: React.FC = () => {
               placeholder="Enter your email"
               error={errors.email}
             />
+            <FormInput
+              id="phone"
+              name="Phone Number"
+              autoComplete="tel"
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="(00) 00000-0000"
+              error={errors.phone}
+              formatter={(value: string): string => {
+                const cleaned = value.replace(/\D/g, '');
+                if (cleaned.length === 0) return '';
+                if (cleaned.length <= 2) return `(${cleaned}`;
+                if (cleaned.length <= 7) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2)}`;
+                if (cleaned.length <= 11) return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7)}`;
+                return `(${cleaned.slice(0, 2)}) ${cleaned.slice(2, 7)}-${cleaned.slice(7, 11)}`;
+              }}
+            />
+            <FormInput
+              id="date_of_birth"
+              name="Date of Birth"
+              autoComplete='bday'
+              value={formData.date_of_birth}
+              onChange={handleChange}
+              placeholder="DD/MM/YYYY"
+              error={errors.date_of_birth}
+              formatter={(value: string): string => {
+                const cleaned = value.replace(/\D/g, '');
+                if (cleaned.length <= 2) return cleaned;
+                if (cleaned.length <= 4) return `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`;
+                return `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4, 8)}`;
+              }}
+            />
 
             {/* Password Requirements Section */}
             <div className="space-y-4">
@@ -222,10 +266,7 @@ const SignUp: React.FC = () => {
               />
               <PasswordStrengthBar password={formData.password} />
 
-              {(showRequirements) && (
-                <PasswordRequirements password={formData.password} />
-              )}
-
+              {showRequirements && <PasswordRequirements password={formData.password} />}
             </div>
 
 
@@ -252,7 +293,7 @@ const SignUp: React.FC = () => {
       </div>
 
       {/* Right side - Hero Image/Content */}
-      <div className="hidden lg:flex w-1/2 h-screen items-center justify-center bg-gradient-to-br from-green-500 to-blue-500 p-12">
+      <div className="hidden lg:flex w-1/2 min-h-screen items-center justify-center bg-gradient-to-br from-green-500 to-blue-500 p-12">
         <div className="text-center text-white max-w-xl">
           <div className="mx-auto mb-8 h-24 w-24">
             <svg fill="currentColor" viewBox="0 0 24 24">
@@ -275,8 +316,7 @@ const SignUp: React.FC = () => {
           </div>
         </div>
       </div>
-    </div >
+    </div>
+
   );
 };
-
-export default SignUp;
