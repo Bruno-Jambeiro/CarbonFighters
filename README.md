@@ -91,8 +91,13 @@ To set up the project locally, follow these steps:
 ```sh
 # backend/.env
 
+# Port to listen
 PORT=3000
-DB_PATH=./data/database.sqlite
+
+# SQLite database file path
+DB_PATH=./database.sqlite
+
+# JWT configuration
 JWT_SECRET=your-jwt-secret
 JWT_EXPIRATION=1h
 ```
