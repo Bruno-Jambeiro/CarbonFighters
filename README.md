@@ -21,14 +21,7 @@ The backend uses **Node.js**, providing a fast and scalable environment for buil
   "email": "john@email.com",
   "phone": "+5500987654321",
   "password": "encrypted_password",
-  "date_of_birth": "1990-01-01",
-  "address": {
-    "street": "123 Main St",
-    "city": "Anytown",
-    "state": "CA",
-    "zip_code": "12345",
-    "country": "USA"
-  }
+  "date_of_birth": "1990-01-01"
 }
 ```
 

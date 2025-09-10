@@ -1,0 +1,33 @@
+name: Run Backend Tests
+
+on:
+  push:
+    branches:
+      - main
+      - automated-tests # Test if the actions are set up correctly
+  pull_request:
+    branches:
+      - "**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [20.x] # specify Node.js version
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: Install dependencies
+        run: cd backend && npm ci
+
+      - name: Run Tests
+        run: cd backend && npm test

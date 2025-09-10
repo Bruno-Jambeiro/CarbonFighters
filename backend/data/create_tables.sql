@@ -2,19 +2,15 @@ CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     full_name TEXT NOT NULL,
     email TEXT NOT NULL UNIQUE,
-    phone TEXT,
+    phone TEXT NOT NULL,
     password TEXT NOT NULL,
-    date_of_birth TIMESTAMP,
-    street TEXT,
-    city TEXT,
-    state TEXT,
-    zip_code TEXT,
-    country TEXT
+    date_of_birth TIMESTAMP NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS follows (
-    follower_id INTEGER FOREIGN KEY REFERENCES users(id) ON DELETE CASCADE,
-    followed_id INTEGER FOREIGN KEY REFERENCES users(id) ON DELETE CASCADE,
+    follower_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    followed_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (follower_id, followed_id)
 );
 
