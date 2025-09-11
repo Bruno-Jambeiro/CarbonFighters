@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import PasswordStrengthBar from '../components/passwordStrengthBar';
@@ -28,7 +28,8 @@ export default function SignUp() {
   });
   const [isLoading, setIsLoading] = useState(false);
   const [showRequirements, setShowRequirements] = useState(true);
-
+  const [showPopup, setShowPopup] = useState(false);
+  const navigate = useNavigate();
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -128,31 +129,39 @@ export default function SignUp() {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/auth/register', {
+        const response = await fetch('http://localhost:3000/auth/register', {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
           },
           body: JSON.stringify({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
+            full_name: formData.firstName + ' ' + formData.lastName,
             email: formData.email,
             password: formData.password,
+            phone: formData.phone,
+            date_of_birth: formData.date_of_birth,
           }),
         });
 
         if (response.ok) {
           const data = await response.json();
-          // Store token in localStorage or context
-          localStorage.setItem('token', data.token);
-          // Redirect to dashboard or main app
-          console.log('Registration successful:', data);
+          localStorage.setItem('session_token', data.token);
+
+          setShowPopup(true);
+
+          // Hide popup after 3 seconds and redirect
+          setTimeout(() => {
+            setShowPopup(false);
+            navigate("/home"); // replace with your target route
+          }, 2000);
+
         } else {
+          console.log(response)
           const errorData = await response.json();
           setErrors({
             firstName: '',
             lastName: '',
-            email: errorData.message || 'Registration failed',
+            email: errorData.error || 'Registration failed',
             phone: '',
             date_of_birth: '',
             password: '',
@@ -189,7 +198,13 @@ export default function SignUp() {
             <p className="text-lg text-gray-500">Create your account and start making a difference</p>
           </div>
 
-          <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
+          {showPopup && (
+            <div className="fixed top-5 right-2/3 bg-green-500 text-white px-4 py-3 rounded shadow-lg animate-fade-in">
+              Register successful! Redirecting...
+            </div>
+          )}
+
+          <form className="flex flex-col gap-6 w-3/5" onSubmit={handleSubmit}>
             <FormInput
               id="firstName"
               name="First Name"
