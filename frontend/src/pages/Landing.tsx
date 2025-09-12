@@ -1,9 +1,7 @@
-import Footer from "../components/footer/FooterDash";
 import Header from "../components/headers/HeaderDash";
+import Footer from "../components/footer/FooterDash";
 
-export default function Home() {
-    const sessionToken = localStorage.getItem("session_token")?.slice(0, 8) + '...';
-
+export default function Landing() {
     return (
         <div className="w-screen h-screen flex flex-col overflow-x-hidden">
             <Header />
@@ -12,16 +10,14 @@ export default function Home() {
                 <div className="max-w-7xl mx-auto px-6 py-12">
                     <div className="text-center">
                         <h1 className="text-4xl font-bold text-green-100 mb-6">
-                            Home Page - Content coming soon!
+                            Welcome to Carbon Fighters!
                         </h1>
                         <p className="text-lg text-gray-800 max-w-2xl mx-auto">
-                            You are logged in with token:
-                            <br />
-                            {sessionToken}
+                            Join the fight against climate change and
+                            reduce your carbon footprint.
                         </p>
                     </div>
                 </div>
-
             </main>
 
             <Footer />

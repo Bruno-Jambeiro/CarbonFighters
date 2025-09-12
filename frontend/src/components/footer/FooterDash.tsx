@@ -4,31 +4,6 @@ export default function Footer() {
     return (
         <footer className="w-screen bg-white text-white py-10 px-6 ">
             <div className="max-w-7xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-8">
-                {/* User Section */}
-                <div>
-                    <h2 className="text-lg text-black font-semibold mb-4 border-b border-slate-600 pb-2">
-                        User
-                    </h2>
-                    <ul className="space-y-2">
-                        <li>
-                            <Link
-                                to="/login"
-                                className="text-green-500 hover:text-blue-400 transition-colors duration-200"
-                            >
-                                Login
-                            </Link>
-                        </li>
-                        <li>
-                            <Link
-                                to="/registro"
-                                className="text-green-500 hover:text-blue-400 transition-colors duration-200"
-                            >
-                                Sign Up
-                            </Link>
-                        </li>
-                    </ul>
-                </div>
-
                 {/* Links Section */}
                 <div>
                     <h2 className="text-lg text-black font-semibold mb-4 border-b border-slate-600 pb-2">
@@ -37,7 +12,7 @@ export default function Footer() {
                     <ul className="space-y-2">
                         <li>
                             <Link
-                                to="/instrucciones"
+                                to="/instructions"
                                 className="text-green-500 hover:text-blue-400 transition-colors duration-200"
                             >
                                 Instructions
@@ -45,7 +20,7 @@ export default function Footer() {
                         </li>
                         <li>
                             <Link
-                                to="/empresas"
+                                to="/companies"
                                 className="text-green-500 hover:text-blue-400 transition-colors duration-200"
                             >
                                 Companies
@@ -53,7 +28,7 @@ export default function Footer() {
                         </li>
                         <li>
                             <Link
-                                to="/promociones"
+                                to="/promotions"
                                 className="text-green-500 hover:text-blue-400 transition-colors duration-200"
                             >
                                 Promotions

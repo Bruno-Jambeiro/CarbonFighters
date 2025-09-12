@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import carbonFightersLogo from '../assets/carbonfighters.png';
+import RedirectingPopup from '../components/redirectingPopup';
 
 
 const Login: React.FC = () => {
@@ -17,6 +18,7 @@ const Login: React.FC = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
+  const [showPopup, setShowPopup] = useState(false);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -73,8 +75,8 @@ const Login: React.FC = () => {
 
       if (response.ok) {
         const data = await response.json();
-        console.log('Login successful, saving token: ', data.token);
-        // Handle successful login (e.g., redirect, store token, etc.)
+        localStorage.setItem('session_token', data.token);
+        setShowPopup(true);
       } else {
         const errorData = await response.json();
         console.error('Login failed: ', errorData.error);
@@ -101,6 +103,8 @@ const Login: React.FC = () => {
               Sign in to continue your environmental journey
             </p>
           </div>
+
+          <RedirectingPopup active={showPopup} text="Login successfull! Redirecting..." target="/home" />
 
           <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
             <FormInput

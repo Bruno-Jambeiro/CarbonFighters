@@ -1,32 +1,34 @@
 import { Link } from "react-router";
+import carbonFightersLogo from '../../assets/carbonfighters.png';
+
 
 export default function Header() {
   return (
-    <header className="w-screen flex items-center justify-between px-6 py-4 bg-white shadow-lg border-b-2 border-green-500">
-      {/* Logo e nome */}
+    <header className="w-screen flex items-center justify-between px-6 py-4 bg-white shadow-lg">
+      {/* Logo and name */}
       <div className="flex items-center gap-3">
-        <div className="w-10 h-10 bg-green-600 rounded-full flex items-center justify-center">
-          <span className="text-white font-bold text-lg">🌱</span>
-        </div>
-        <h1 className="text-2xl font-bold text-green-700">Carbon Fighter</h1>
+
+        <img src={carbonFightersLogo} alt="Carbon Fighters Logo" height={40} width={40} />
+
+        <h1 className="text-2xl font-bold text-green-700">Carbon Fighters</h1>
       </div>
 
       {/* Nav */}
       <nav className="hidden md:flex gap-6 font-medium">
-        <Link 
-          to="/" 
+        <Link
+          to="/"
           className="text-gray-700 hover:text-green-600 transition duration-200"
         >
-          Inicio
+          Home
         </Link>
-        <Link 
-          to="/about" 
+        <Link
+          to="/about"
           className="text-gray-700 hover:text-green-600 transition duration-200"
         >
           About
         </Link>
-        <Link 
-          to="/contact" 
+        <Link
+          to="/contact"
           className="text-gray-700 hover:text-green-600 transition duration-200"
         >
           Contact
@@ -49,7 +51,7 @@ export default function Header() {
         </Link>
       </div>
 
-      {/* Menú móvil (hamburger) */}
+      {/* Hamburger menu */}
       <div className="md:hidden">
         <button className="text-gray-700 hover:text-green-600">
           <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
