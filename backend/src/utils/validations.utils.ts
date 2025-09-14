@@ -23,12 +23,7 @@ export function validateEmailFormat(email: string): string | null {
     const emailRegex = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)+$/;
     if (
         typeof email !== 'string' ||
-        !emailRegex.test(email) ||
-        email.startsWith('@') ||
-        email.endsWith('@') ||
-        email.includes('..') ||
-        email.includes(',') ||
-        email.split('@').length !== 2
+        !emailRegex.test(email)
     ) {
         return "Invalid email format";
     }
