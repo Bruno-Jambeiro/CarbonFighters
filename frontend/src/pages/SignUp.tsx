@@ -8,6 +8,7 @@ import SideBar from '../components/signUpSideBar';
 import carbonFightersLogo from '../assets/carbonfighters.png';
 import { validateDate, validateEmailFormat, validatePasswordStrength } from '../utils/validations.utils';
 import RedirectingPopup from '../components/redirectingPopup';
+import { registerURL } from '../utils/urls';
 
 
 export default function SignUp() {
@@ -131,7 +132,7 @@ export default function SignUp() {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        const response = await fetch('http://localhost:3000/auth/register', {
+        const response = await fetch(registerURL, {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',

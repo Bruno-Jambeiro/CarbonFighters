@@ -4,6 +4,7 @@ import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import carbonFightersLogo from '../assets/carbonfighters.png';
 import RedirectingPopup from '../components/redirectingPopup';
+import { loginURL } from '../utils/urls';
 
 
 const Login: React.FC = () => {
@@ -65,7 +66,7 @@ const Login: React.FC = () => {
 
     if (validateForm()) {
       setIsLoading(true);
-      const response = (await fetch('http://localhost:3000/auth/login', {
+      const response = (await fetch(loginURL, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
