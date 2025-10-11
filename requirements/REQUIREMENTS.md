@@ -19,33 +19,31 @@ The following applications were selected for analysis:
 
 "Act Now" serves as the official app for the United Nations' campaign, functioning as an educational tool with strong credibility. Its main purpose is to engage a global community in climate action by allowing users to calculate their carbon footprint and participate in gamified challenges to collectively save CO2, water, and energy.
 
-#### Feature and Characteristic Analysis
+#### Features and Characteristic Analysis
 
-##### Feature: Questionnaire-Based Carbon Footprint Calculation
-The app calculates a user's initial carbon footprint through a guided questionnaire about their lifestyle habits. This feature provides a personalized baseline, giving users a tangible starting point and a metric against which they can measure their progress.
-
-**Visual Evidence:**
-![Image description](path/to/your/image.png)
-
-##### Feature: Collective Goal-Oriented Gamification
-AWorld employs a gamification system with points, levels, and badges to motivate users. However, its competition mechanics are focused on collective achievement rather than direct rivalry. Users participate in time-based, public "Collective Challenges" where they contribute to a large-scale shared goal, such as a global reduction in CO₂.
+- #### Feature: Questionnaire-Based Carbon Footprint Calculation
+    The app calculates a user's initial carbon footprint through a guided questionnaire about their lifestyle habits. This feature provides a personalized baseline, giving users a tangible starting point and a metric against which they can measure their progress.
 
 **Visual Evidence:**
-![Image description](path/to/your/image.png)
+![Questions](../requirements/assets/questions.png)
 
-##### Feature: Daily Streak Challenge
-This feature stimulates the user to open the app daily to maintain their engagement streak. It offers rewards within the gamification system for users who successfully keep their streak active.
+- #### Feature: Collective Goal-Oriented Gamification
+    AWorld employs a gamification system with points, levels, and badges to motivate users. However, its competition mechanics are focused on collective achievement rather than direct rivalry. Users participate in time-based, public "Collective Challenges" where they contribute to a large-scale shared goal, such as a global reduction in CO₂.
+
+**Visual Evidence:**
+![Gamefication](../requirements/assets/game.png)
+
+- #### Feature: Daily Streak Challenge
+    This feature stimulates the user to open the app daily to maintain their engagement streak. It offers rewards within the gamification system for users who successfully keep their streak active.
 
 **Visual Evidence:**
 ![Streak Page](../requirements/assets/streak.jpeg)
 
-##### Feature: Community Engagement Tools
-The application includes a group and a chronological activity feed to foster a sense of a global community. These tools allow users to see other users profiles and see the sustainable actions others are taking, though they lack features for social proof like photo sharing and chat communication.
+- #### Feature: Community Engagement Tools
+    The application includes a group and a chronological activity feed to foster a sense of a global community. These tools allow users to see other users profiles and see the sustainable actions others are taking, though they lack features for social proof like photo sharing and chat communication.
 
 **Visual Evidence:**
-![Image description](path/to/your/image.png)
-
-*(Continue adding feature sections as needed)*
+![Image description](../requirements/assets/community.jpeg)
 
 ---
 
@@ -70,11 +68,13 @@ The application includes a group and a chronological activity feed to foster a s
 
 ## 3. Synthesis and Final Analysis
 
-*This final section is crucial. Here you will consolidate all the learnings from the analysis.*
+[comment]: # (*This final section is crucial. Here you will consolidate all the learnings from the analysis.*) 
+
+From AWorld the main features that can be used are the carbon footprint calculation, that can recieve modifications to serve the porpouse of CarbonFighthers better, the streak, for estimulationg users using the application every day and the gamification system along with it, and adapt the community feature to be groups more simmilar to the gymrats version.
 
 ### 3.1 General Patterns and Observations
 
-*Based on the analysis of all applications, list the most important patterns and observations. What do they have in common? What stands out as a market trend?*
+[comment]: # (*Based on the analysis of all applications, list the most important patterns and observations. What do they have in common? What stands out as a market trend?*)
 
 * **Common Patterns:** (e.g., "Most applications divide content into topics and subtopics and use a gamification system to engage users").
 * **Innovative Highlights:** (e.g., "The feature to export content as Markdown from 'Notion' is a major differentiator for advanced users").
@@ -82,10 +82,10 @@ The application includes a group and a chronological activity feed to foster a s
 
 ### 3.2 Elicited Requirements and Features of Interest
 
-*Translate your observations into a list of potential requirements or features for your project. This list will be the foundation for creating your Epics and User Stories.*
+[comment]: #  (*Translate your observations into a list of potential requirements or features for your project. This list will be the foundation for creating your Epics and User Stories.*)
 
-* **[Requirement 1]**: (e.g., The system should allow searching by postal code in addition to the city name).
-* **[Requirement 2]**: (e.g., The system should save the user's search history locally).
-* **[Requirement 3]**: (e.g., The interactive map must be fully navigable using only the keyboard).
+* **Streak**: The system should ...
+* **Carbon Footprint Calculation**: The system should ...
+* **Groups**: The system should allow the cration of groups with chats and scoreboards...
 * **[Requirement 4]**: (e.g., Implement a newsletter system for user engagement).
 * ...
