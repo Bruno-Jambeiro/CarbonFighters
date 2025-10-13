@@ -114,8 +114,8 @@ On the home screen, the Actions tab is easily identifiable at the bottom of the 
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="./requirements/assets/EarthHerosPrints/HomeScreen.PNG" alt="Actions list" width="300" />
-  <img src="./requirements/assets/EarthHerosPrints/ActionsTab.PNG" alt="Action details" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/HomeScreen.PNG" alt="Actions list" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/ActionsTab.PNG" alt="Action details" width="300" />
 </div>
 
 
@@ -123,14 +123,14 @@ At the top, there is a tab dedicated to searching for new actions. The actions a
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="./requirements/assets/EarthHerosPrints/BrowseActions.PNG" alt="Actions list" width="300" />
-  <img src="./requirements/assets/EarthHerosPrints/Action1.jpg" alt="Action details" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/BrowseActions.PNG" alt="Actions list" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/Action1.jpg" alt="Action details" width="300" />
 </div>
 
 There is no verification process to validate task completion. Furthermore, each action can only be scored once, even in cases involving continuous habit changes, such as adopting a fully plant-based diet.
 
 **Visual Evidence:**
-![PlantBased](./requirements/assets/EarthHerosPrints/PlantBased.PNG)
+![PlantBased](../requirements/assets/EarthHerosPrints/PlantBased.PNG)
 
 #### Community and Group Integration
 
@@ -138,9 +138,9 @@ On the home screen, the Communities tab is easily identifiable at the bottom of 
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="./requirements/assets/EarthHerosPrints/CommunityTab.PNG" alt="Home screen" width="300" />
-  <img src="./requirements/assets/EarthHerosPrints/CommunityDescription.PNG" alt="Action details" width="300" />
-  <img src="./requirements/assets/EarthHerosPrints/CommunitySite.PNG" alt="Browse actions" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/CommunityTab.PNG" alt="Home screen" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/CommunityDescription.PNG" alt="Action details" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/CommunitySite.PNG" alt="Browse actions" width="300" />
 </div>
 
 Earth Heroes does not include features for creating or interacting with internal communities. The Communities tab functions only as a gateway to external organizations, without offering mechanisms for direct engagement between users. Consequently, it is not possible to view or compare friends’ scores within the app itself.
@@ -151,8 +151,8 @@ On the home screen, there is no specific tab for “Targets” or objectives. Ho
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="./requirements/assets/EarthHerosPrints/EmissionsTab.PNG" alt="Actions list" width="300" />
-  <img src="./requirements/assets/EarthHerosPrints/SetTarget.jpg" alt="Action details" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/EmissionsTab.PNG" alt="Actions list" width="300" />
+  <img src="../requirements/assets/EarthHerosPrints/SetTarget.jpg" alt="Action details" width="300" />
 </div>
 
 In this area, the app allows users to establish a personal reduction percentage but does not offer the option to create Targets based on “Earth Points.” This limitation may reduce user motivation to perform certain actions that, while environmentally beneficial, do not directly affect their personal emissions.
