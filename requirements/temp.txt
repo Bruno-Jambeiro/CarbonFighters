@@ -1,0 +1,28 @@
+Earth Heroes
+
+In this application, the following features were evaluated: Sustainable action scoring, Community and group integration, and Goal setting.
+
+Sustainable Action Scoring
+
+On the home screen, the Actions tab is easily identifiable at the bottom of the screen, which facilitates access. When clicking on the corresponding icon, the user is directed to a section that displays their completed actions and current goals.
+(ADD 2 IMAGES)
+
+At the top, there is a tab dedicated to searching for new actions. The actions are organized by category, making navigation simple and intuitive. When selecting an action, the user can mark it as completed and receive the corresponding points.
+(ADD IMAGES)
+
+There is no verification process to validate task completion. Furthermore, each action can only be scored once, even in cases involving continuous habit changes, such as adopting a fully plant-based diet.
+(ADD IMAGE)
+
+Community and Group Integration
+
+On the home screen, the Communities tab is easily identifiable at the bottom of the interface. Upon accessing it, the user is directed to the “Discover Climate Organizations” section, where they can explore various initiatives. By clicking on any of them, the app displays a brief description of the organization and offers a button that redirects the user to the official website, outside the app.
+(ADD 4 IMAGES)
+
+Earth Heroes does not include features for creating or interacting with internal communities. The Communities tab functions only as a gateway to external organizations, without offering mechanisms for direct engagement between users. Consequently, it is not possible to view or compare friends’ scores within the app itself.
+
+Goal Setting
+
+On the home screen, there is no specific tab for “Goals” or objectives. However, by accessing the Emissions tab, users can find the “Set a target” section, where they can define their carbon emission reduction goal.
+(ADD 2 IMAGES)
+
+In this area, the app allows users to establish a personal reduction percentage but does not offer the option to create goals based on “Earth Points.” This limitation may reduce user motivation to perform certain actions that, while environmentally beneficial, do not directly affect their personal emissions.
