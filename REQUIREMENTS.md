@@ -25,25 +25,25 @@ The following applications were selected for analysis:
   The app calculates a user's initial carbon footprint through a guided questionnaire about their lifestyle habits. This feature provides a personalized baseline, giving users a tangible starting point and a metric against which they can measure their progress.
 
 **Visual Evidence:**
-![Questions](../requirements/assets/questions.png)
+![Questions](./assets/questions.png)
 
 - #### Feature: Collective Target-Oriented Gamification
   AWorld employs a gamification system with points, levels, and badges to motivate users. However, its competition mechanics are focused on collective achievement rather than direct rivalry. Users participate in time-based, public "Collective Challenges" where they contribute to a large-scale shared Target, such as a global reduction in CO₂.
 
 **Visual Evidence:**
-![Gamefication](../requirements/assets/game.png)
+![Gamefication](./assets/game.png)
 
 - #### Feature: Daily Streak Challenge
   This feature stimulates the user to open the app daily to maintain their engagement streak. It offers rewards within the gamification system for users who successfully keep their streak active.
 
 **Visual Evidence:**
-![Streak Page](../requirements/assets/streak.jpeg)
+![Streak Page](./assets/streak.jpeg)
 
 - #### Feature: Community Engagement Tools
   The application includes a group and a chronological activity feed to foster a sense of a global community. These tools allow users to see other users profiles and see the sustainable actions others are taking, though they lack features for social proof like photo sharing and chat communication.
 
 **Visual Evidence:**
-![Image description](../requirements/assets/community.jpeg)
+![Image description](./assets/community.jpeg)
 
 ---
 
@@ -74,19 +74,19 @@ GymRats is a social fitness application designed to make exercise engaging throu
 
 **Visual Evidence:**
 
-<img src="../requirements/assets/workout_tracking.jpg" width="300px" >
+<img src="./assets/workout_tracking.jpg" width="300px" >
 
 - #### Feature: Competitive and Collaborative Challenges
   Users can join or create fitness challenges, either competitive (ranked leaderboards) or collaborative (group progress toward shared Targets). This dual mode promotes both rivalry and teamwork, catering to different motivational styles.
 
 **Visual Evidence:**  
-<img src="../requirements/assets/challenge.jpg" width="300px" >
+<img src="./assets/challenge.jpg" width="300px" >
 
 - #### Feature: Social Feed and Media Sharing
   The app features a social feed where users post reactions, comments, and peer validation, encouraging consistent participation.
 
 **Visual Evidence:**  
-<img src="../requirements/assets/feed.jpg" width="300px" >
+<img src="./assets/feed.jpg" width="300px" >
 
 ---
 
@@ -114,8 +114,8 @@ On the home screen, the Actions tab is easily identifiable at the bottom of the 
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="../requirements/assets/EarthHerosPrints/HomeScreen.PNG" alt="Actions list" width="300" />
-  <img src="../requirements/assets/EarthHerosPrints/ActionsTab.PNG" alt="Action details" width="300" />
+  <img src="./assets/EarthHerosPrints/HomeScreen.PNG" alt="Actions list" width="300" />
+  <img src="./assets/EarthHerosPrints/ActionsTab.PNG" alt="Action details" width="300" />
 </div>
 
 
@@ -123,14 +123,14 @@ At the top, there is a tab dedicated to searching for new actions. The actions a
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="../requirements/assets/EarthHerosPrints/BrowseActions.PNG" alt="Actions list" width="300" />
-  <img src="../requirements/assets/EarthHerosPrints/Action1.jpg" alt="Action details" width="300" />
+  <img src="./assets/EarthHerosPrints/BrowseActions.PNG" alt="Actions list" width="300" />
+  <img src="./assets/EarthHerosPrints/Action1.jpg" alt="Action details" width="300" />
 </div>
 
 There is no verification process to validate task completion. Furthermore, each action can only be scored once, even in cases involving continuous habit changes, such as adopting a fully plant-based diet.
 
 **Visual Evidence:**
-![PlantBased](../requirements/assets/EarthHerosPrints/PlantBased.PNG)
+![PlantBased](./assets/EarthHerosPrints/PlantBased.PNG)
 
 #### Community and Group Integration
 
@@ -138,9 +138,9 @@ On the home screen, the Communities tab is easily identifiable at the bottom of 
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="../requirements/assets/EarthHerosPrints/CommunityTab.PNG" alt="Home screen" width="300" />
-  <img src="../requirements/assets/EarthHerosPrints/CommunityDescription.PNG" alt="Action details" width="300" />
-  <img src="../requirements/assets/EarthHerosPrints/CommunitySite.PNG" alt="Browse actions" width="300" />
+  <img src="./assets/EarthHerosPrints/CommunityTab.PNG" alt="Home screen" width="300" />
+  <img src="./assets/EarthHerosPrints/CommunityDescription.PNG" alt="Action details" width="300" />
+  <img src="./assets/EarthHerosPrints/CommunitySite.PNG" alt="Browse actions" width="300" />
 </div>
 
 Earth Heroes does not include features for creating or interacting with internal communities. The Communities tab functions only as a gateway to external organizations, without offering mechanisms for direct engagement between users. Consequently, it is not possible to view or compare friends’ scores within the app itself.
@@ -151,8 +151,8 @@ On the home screen, there is no specific tab for “Targets” or objectives. Ho
 
 **Visual Evidence:**
 <div style="display:flex; gap:10px; align-items:center;">
-  <img src="../requirements/assets/EarthHerosPrints/EmissionsTab.PNG" alt="Actions list" width="300" />
-  <img src="../requirements/assets/EarthHerosPrints/SetTarget.jpg" alt="Action details" width="300" />
+  <img src="./assets/EarthHerosPrints/EmissionsTab.PNG" alt="Actions list" width="300" />
+  <img src="./assets/EarthHerosPrints/SetTarget.jpg" alt="Action details" width="300" />
 </div>
 
 In this area, the app allows users to establish a personal reduction percentage but does not offer the option to create Targets based on “Earth Points.” This limitation may reduce user motivation to perform certain actions that, while environmentally beneficial, do not directly affect their personal emissions.
@@ -175,24 +175,45 @@ In this area, the app allows users to establish a personal reduction percentage 
 
 ## 3. Synthesis and Final Analysis
 
-[comment]: # '*This final section is crucial. Here you will consolidate all the learnings from the analysis.*'
+While existing sustainability apps like **AWorld** and **Earth Heroes** focus on education, individual tracking, or large-scale collective goals, they lack the engaging, user-driven, small-group competition mechanics that have proven highly successful in the social fitness space, exemplified by **GymRats**.
 
-From AWorld the main features that can be used are the carbon footprint calculation, that can recieve modifications to serve the porpouse of CarbonFighthers better, the streak, for estimulationg users using the application every day and the gamification system along with it, and adapt the community feature to be groups more simmilar to the gymrats version.
+Our strategic path is to combine the best of both worlds: the credible, habit-forming features of the eco-apps with the powerful social competition engine that makes GymRats so addictive. Our app's Unique Value Proposition (UVP) will be its focus on making sustainability a **fun, social, and competitive activity among friends**.
 
 ### 3.1 General Patterns and Observations
 
-[comment]: # '*Based on the analysis of all applications, list the most important patterns and observations. What do they have in common? What stands out as a market trend?*'
+* **Common Patterns:**
+    * **Gamification is a core pillar:** All analyzed sustainability apps (AWorld, Earth Heroes) utilize gamification elements like points, badges, and challenges to drive user engagement.
+    * **Manual Logging is the standard:** The primary method for tracking sustainable actions is manual user input, often from a predefined and categorized list.
+    * **Community is a goal, but implementation is weak:** While apps aim to create a sense of community, the execution often lacks direct interaction. AWorld has a passive global feed, and Earth Heroes only links to external organizations, leaving a gap for intimate, in-app social features.
 
-- **Common Patterns:** (e.g., "Most applications divide content into topics and subtopics and use a gamification system to engage users").
-- **Innovative Highlights:** (e.g., "The feature to export content as Markdown from 'Notion' is a major differentiator for advanced users").
-- **Common Weaknesses:** (e.g., "We noted that keyboard accessibility is a weak point in most applications that use interactive maps").
+* **Innovative Highlights & Key Opportunities:**
+    * **Flexible Group Competition (from GymRats):** The ability for users to create their own groups and choose between time-bound "Challenges" and ongoing "Clubs" is a powerful model for sustained engagement that is absent in the eco-app market.
+    * **Social Proof (from GymRats):** The "pics or it didn't happen" mechanism of requiring photo evidence is a key differentiator that increases accountability, engagement, and social sharing. This is a significant feature missing from competitors.
+
+* **Identified Market Gap:**
+    * There is no dominant application that focuses on **direct, small-group rivalry** for sustainability. The current market leans towards individual responsibility or vague collective action, missing the powerful motivator of friendly competition.
 
 ### 3.2 Elicited Requirements and Features of Interest
 
-[comment]: # '*Translate your observations into a list of potential requirements or features for your project. This list will be the foundation for creating your Epics and User Stories.*'
+Based on the analysis, the following core requirements have been elicited. These will form the foundation for our product's Epics and User Stories.
 
-- **Streak**: The system should ...
-- **Carbon Footprint Calculation**: The system should ...
-- **Groups**: The system should allow the cration of groups with chats and scoreboards...
-- **[Requirement 4]**: (e.g., Implement a newsletter system for user engagement).
-- ...
+* **User-Created Groups:** The system must allow any user to create groups, with options for privacy (public, private, invite-only). This empowers users and fosters organic community growth.
+
+* **Flexible Competition Formats:** The system must support two distinct group types:
+    * **Challenges:** Time-bound competitions with a clear start/end date and a winner.
+    * **Clubs:** Ongoing communities for long-term accountability, with leaderboards that can reset on a cycle (e.g., monthly).
+
+* **Real-time Leaderboards:** The system must display a real-time leaderboard within each group, ranking members based on their "Eco Points" to fuel competition.
+
+* **Manual Activity Logging:** The system must provide a simple interface for users to log their sustainable actions from a categorized and predefined list.
+
+* **Social Proof with Visual Evidence:** The system must allow users to attach a photo to their logged activities to validate their actions and share them on a social feed.
+
+* **Integrated Group Chat:** The system must include a dedicated real-time chat feature within each group to allow for communication, motivation, and social interaction.
+
+* **Gamification Engine:**
+    * **Points System:** The system must award users "Eco Points" for completing sustainable actions.
+    * **Daily Streaks:** The system must track and visually represent a user's streak of consecutive days with at least one logged action to encourage daily engagement.
+    * **Achievements/Badges:** The system must award users badges for reaching predefined milestones (e.g., number of actions logged, streak length, challenges won).
+
+* **Onboarding Footprint Calculator:** The system should offer a simple, questionnaire-based tool for new users to calculate their initial carbon footprint, providing a personalized starting point.
