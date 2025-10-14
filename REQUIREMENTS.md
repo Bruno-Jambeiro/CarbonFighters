@@ -1,4 +1,26 @@
-# Benchmarking Analysis
+# Requirements Elicitation
+
+For this phase of the Carbon Fighters project, two requirements elicitation techniques were used:
+
+- **Interviews (Funnel Structure):** to directly understand the needs and expectations of potential users.
+- **Benchmarking:** to analyze how similar platforms approach environmental awareness and the gamification of sustainable actions.
+
+The overall goal of this stage was to identify functional and non-functional requirements that will serve as the basis for defining epics and user stories in the next phase of the project.
+
+The transcriptions of the interviews can be seen [here](./evidences/interview)
+
+## Interview - Funnel Structure
+
+### 1. Introduction
+
+The interviews were conducted online with potential users of the system, seeking to understand their behavior, motivations, and the difficulties they face in adopting sustainable practices in their daily lives.
+A funnel-type structure was used to organize the questions progressively—starting from a general context and moving toward specific operations and requirements.
+
+### 2. Interview Objective
+
+The objective of this interview is to understand the context, goals, needs, and operations related to the Carbon Fighters project, identifying information that allows for the elicitation of requirements for the development of a technological solution focused on environmental awareness and carbon emission reduction.
+
+## Benchmarking Analysis
 
 ## 1. Overview and Selected Applications
 
