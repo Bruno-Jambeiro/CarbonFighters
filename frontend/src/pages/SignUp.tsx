@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import PasswordStrengthBar from '../components/passwordStrengthBar';
@@ -7,6 +7,8 @@ import PasswordRequirements from '../components/passwordRequeriments';
 import carbonFightersLogo from '../assets/carbonfighters.png';
 
 const SignUp: React.FC = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -139,12 +141,14 @@ const SignUp: React.FC = () => {
           localStorage.setItem('token', data.token);
           // Redirect to dashboard or main app
           console.log('Registration successful:', data);
+
+          navigate("/dashboard")
         } else {
           const errorData = await response.json();
           setErrors({
             firstName: '',
             lastName: '',
-            email: errorData.message || 'Registration failed',
+            email: errorData.error || 'Registration failed',
             password: '',
             confirmPassword: ''
           });

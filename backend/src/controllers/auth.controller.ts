@@ -45,8 +45,6 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
             password: hashedPassword,
         });
 
-        // TODO Create JWT token
-
         // Respond with success
         return res.status(201).json({
             message: "User registered successfully",
