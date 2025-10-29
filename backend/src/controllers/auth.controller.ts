@@ -9,11 +9,11 @@ type RegisterBody = Omit<User, 'id' | 'created_at'>;
 
 export async function register(req: Request<{}, {}, RegisterBody>, res: Response) {
     try {
-        const { full_name, email, phone, password, date_of_birth } = req.body;
+        const { firstName, lastName, email, password } = req.body;
 
         // Basic validation
-        if (!full_name || !email || !phone || !password || !date_of_birth)
-            return res.status(400).json({ error: "All fields are required" });
+        if (!firstName || !lastName || !email || !password)
+            return res.status(400).json({ error: "All fields are required", received: req.body });
 
 
         // Email validation
@@ -39,11 +39,10 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
 
         // Create new user
         const newUser = await userService.createUser({
-            full_name,
+            firstName,
+            lastName,
             email,
-            phone,
             password: hashedPassword,
-            date_of_birth,
         });
 
         // TODO Create JWT token
@@ -52,9 +51,8 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
         return res.status(201).json({
             message: "User registered successfully",
             user: {
-                full_name: newUser!.full_name,
-                email: newUser!.email,
-                created_at: newUser!.created_at,
+                ...newUser,
+                password: undefined // Do not send the password hash back
             },
             token: generateToken({ id: newUser!.id, email: newUser!.email }),
         });

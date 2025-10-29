@@ -19,8 +19,8 @@ export async function createUser(user: Omit<User, 'id' | 'created_at'>): Promise
     const db = await getDb();
 
     await db.run(
-        'INSERT INTO users (full_name, email, phone, password, date_of_birth) VALUES (?, ?, ?, ?, ?);',
-        [user.full_name, user.email, user.phone, user.password, user.date_of_birth]
+        'INSERT INTO users (firstName, lastName, email,  password) VALUES (?, ?, ?, ?);',
+        [user.firstName, user.lastName, user.email, user.password]
     );
 
     return await getUser(user.email);
