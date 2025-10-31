@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import carbonFightersLogo from '../assets/carbonfighters.png';
 
 
 const Login: React.FC = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     email: '',
     password: ''
@@ -74,7 +76,9 @@ const Login: React.FC = () => {
       if (response.ok) {
         const data = await response.json();
         console.log('Login successful, saving token: ', data.token);
-        // Handle successful login (e.g., redirect, store token, etc.)
+
+        localStorage.setItem("token", data.token)
+        navigate("/dashboard")
       } else {
         const errorData = await response.json();
         console.error('Login failed: ', errorData.error);

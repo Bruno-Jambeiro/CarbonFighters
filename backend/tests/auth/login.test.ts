@@ -4,21 +4,21 @@ import { verifyToken } from '../../src/services/token.service';
 
 describe('Login Endpoint', () => {
     let exampleUser = {
-        full_name: "Test User",
+        firstName: "Test",
+        lastName: "User",
         email: "user@email.com",
-        phone: "+5500987654321",
         password: "Strongpwd@1",
-        date_of_birth: "01/01/2000",
     }
+
+    beforeAll(async () => {
+        // Register a user to ensure the user exists
+        let createdUser = await request(app)
+            .post('/auth/register')
+            .send(exampleUser);
+    })
 
     // Test case for successful login
     it('should log in an existing user and return a token', async () => {
-
-        // Register a user to ensure the user exists
-        await request(app)
-            .post('/auth/register')
-            .send(exampleUser);
-
         // Attempt to log in with the same credentials
         const response = await request(app)
             .post('/auth/login')

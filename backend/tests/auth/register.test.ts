@@ -4,11 +4,10 @@ import { verifyToken } from '../../src/services/token.service';
 
 describe('Register Endpoint', () => {
     let exampleUser = {
-        full_name: "Test User",
+        firstName: "Test",
+        lastName: "User",
         email: "user@email.com",
-        phone: "+5500987654321",
         password: "Strongpwd@1",
-        date_of_birth: "01/01/2000",
     }
 
     let weakPasswords = [
