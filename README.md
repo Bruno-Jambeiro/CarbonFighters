@@ -273,7 +273,7 @@ Frontend:
 
 - [Jeik Pasquel Bustillos](https://github.com/Savage-22) — RA: 298804
 - Luiza
-- Fernando
+- [Fernando Rdrigues](https://github.com/FernandoRST7)
 - [Rafael Setton](https://github.com/RafaelSetton)
 - Bruno Jambeiro
 
