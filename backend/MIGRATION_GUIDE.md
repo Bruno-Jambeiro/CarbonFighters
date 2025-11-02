@@ -1,38 +1,38 @@
-# 🔄 Guía de Migración: SQLite a PostgreSQL
+# 🔄 Guia de Migração: SQLite para PostgreSQL
 
-## ⚠️ IMPORTANTE - LEE ESTO PRIMERO
+## ⚠️ IMPORTANTE - LEIA ISTO PRIMEIRO
 
-Este proyecto ha sido migrado de **SQLite** a **PostgreSQL**. Si ya tenías el proyecto configurado anteriormente, sigue estos pasos para actualizar tu entorno local.
+Este projeto foi migrado de **SQLite** para **PostgreSQL**. Se você já tinha o projeto configurado anteriormente, siga estes passos para atualizar seu ambiente local.
 
-## 📋 Cambios Principales
+## 📋 Principais Mudanças
 
-### Base de Datos
-- ✅ **Antes:** SQLite (archivo local)
-- ✅ **Ahora:** PostgreSQL (servidor de base de datos)
+### Banco de Dados
+- ✅ **Antes:** SQLite (arquivo local)
+- ✅ **Agora:** PostgreSQL (servidor de banco de dados)
 
-### Modelo de Usuario
-Se agregaron nuevos campos al modelo `User`:
-- `cpf` (obligatorio) - Documento de identificación
-- `phone` (opcional) - Teléfono
-- `birthday` (opcional) - Fecha de nacimiento
-- `id` cambió a `id_user`
+### Modelo de Usuário
+Novos campos foram adicionados ao modelo `User`:
+- `cpf` (obrigatório) - Documento de identificação
+- `phone` (opcional) - Telefone
+- `birthday` (opcional) - Data de nascimento
+- `id` foi alterado para `id_user`
 
-### Testing
-- ✅ Los tests ahora usan una base de datos PostgreSQL separada
-- ✅ Se ejecutan automáticamente en GitHub Actions
+### Testes
+- ✅ Os testes agora usam um banco de dados PostgreSQL separado
+- ✅ São executados automaticamente no GitHub Actions
 
-## 🚀 Pasos para Migrar tu Entorno Local
+## 🚀 Passos para Migrar seu Ambiente Local
 
-### 1. Actualiza las dependencias
+### 1. Atualize as dependências
 
 ```bash
 cd backend
 npm install
 ```
 
-**Nota:** Se instaló `pg` (driver de PostgreSQL) y se removió la dependencia de SQLite.
+**Nota:** Foi instalado o `pg` (driver do PostgreSQL) e a dependência do SQLite foi removida.
 
-### 2. Instala PostgreSQL (si no lo tienes)
+### 2. Instale o PostgreSQL (se você não tiver)
 
 #### Ubuntu/Debian
 ```bash
@@ -48,175 +48,175 @@ brew services start postgresql@15
 ```
 
 #### Windows
-Descarga e instala desde: https://www.postgresql.org/download/windows/
+Baixe e instale em: https://www.postgresql.org/download/windows/
 
-### 3. Crea las bases de datos
+### 3. Crie os bancos de dados
 
 ```bash
-# Base de datos de desarrollo
+# Banco de dados de desenvolvimento
 psql -U postgres -c "CREATE DATABASE carbonfighters;"
 
-# Base de datos de pruebas
+# Banco de dados de testes
 psql -U postgres -c "CREATE DATABASE carbonfighters_test;"
 ```
 
-**Nota:** Si tu usuario de PostgreSQL no es `postgres`, usa tu usuario correspondiente.
+**Nota:** Se seu usuário PostgreSQL não for `postgres`, use seu usuário correspondente.
 
-### 4. Ejecuta el script de creación de tablas
+### 4. Execute o script de criação de tabelas
 
 ```bash
-# Para desarrollo
+# Para desenvolvimento
 psql -U postgres -d carbonfighters -f data/create_tables.sql
 
-# Para pruebas
+# Para testes
 psql -U postgres -d carbonfighters_test -f data/create_tables.sql
 ```
 
-### 5. Configura tus archivos de entorno
+### 5. Configure seus arquivos de ambiente
 
-#### Archivo `.env` (Desarrollo)
+#### Arquivo `.env` (Desenvolvimento)
 
 ```bash
 cp .env.example .env
 ```
 
-Luego edita `.env` y configura tu contraseña de PostgreSQL:
+Depois edite `.env` e configure sua senha do PostgreSQL:
 
 ```env
 DB_USER=postgres
 DB_HOST=localhost
 DB_DATABASE=carbonfighters
-DB_PASSWORD=tu_password_real_aqui  # ⬅️ CAMBIA ESTO
+DB_PASSWORD=sua_senha_real_aqui  # ⬅️ MUDE ISTO
 DB_PORT=5432
 PORT=3000
-TOKEN_SECRET=un-secreto-largo-y-aleatorio
+TOKEN_SECRET=um-segredo-longo-e-aleatorio
 ```
 
-#### Archivo `.env.test` (Tests)
+#### Arquivo `.env.test` (Testes)
 
 ```bash
 cp .env.test.example .env.test
 ```
 
-Luego edita `.env.test` y configura tu contraseña de PostgreSQL:
+Depois edite `.env.test` e configure sua senha do PostgreSQL:
 
 ```env
 DB_USER=postgres
 DB_HOST=localhost
 DB_DATABASE=carbonfighters_test
-DB_PASSWORD=tu_password_real_aqui  # ⬅️ CAMBIA ESTO
+DB_PASSWORD=sua_senha_real_aqui  # ⬅️ MUDE ISTO
 DB_PORT=5432
 PORT=3001
 TOKEN_SECRET=test-secret-key
 ```
 
-### 6. Verifica que todo funcione
+### 6. Verifique se tudo funciona
 
-#### Ejecuta el servidor
+#### Execute o servidor
 ```bash
 npm run dev
 ```
 
-Deberías ver:
+Você deverá ver:
 ```
 Server is running on http://localhost:3000
 ```
 
-#### Ejecuta los tests
+#### Execute os testes
 ```bash
 npm test
 ```
 
-Deberías ver:
+Você deverá ver:
 ```
 Test Suites: 2 passed, 2 total
 Tests:       30 passed, 30 total
 ```
 
-## 🔍 Verificar la instalación de PostgreSQL
+## 🔍 Verificar a instalação do PostgreSQL
 
-### Ver bases de datos creadas
+### Ver bancos de dados criados
 ```bash
 psql -U postgres -l
 ```
 
-### Conectarse a una base de datos
+### Conectar-se a um banco de dados
 ```bash
 psql -U postgres -d carbonfighters
 ```
 
-### Ver las tablas
+### Ver as tabelas
 ```sql
 \dt
 ```
 
-### Salir de psql
+### Sair do psql
 ```sql
 \q
 ```
 
-## 🆕 Nuevas Validaciones
+## 🆕 Novas Validações
 
-### Registro de Usuario
-Ahora el endpoint `POST /auth/register` requiere:
+### Registro de Usuário
+Agora o endpoint `POST /auth/register` requer:
 
-**Campos obligatorios:**
+**Campos obrigatórios:**
 - `firstName`
 - `lastName`
 - `cpf` (11 dígitos)
-- `password` (mínimo 8 caracteres, mayúsculas, minúsculas, números y caracteres especiales)
+- `password` (mínimo 8 caracteres, maiúsculas, minúsculas, números e caracteres especiais)
 
-**Campos opcionales:**
+**Campos opcionais:**
 - `email`
 - `phone`
 - `birthday` (formato: `YYYY-MM-DD`)
 
-### Ejemplo con Thunder Client / Postman
+### Exemplo com Thunder Client / Postman
 
 ```json
 {
-  "firstName": "Juan",
-  "lastName": "Pérez",
+  "firstName": "João",
+  "lastName": "Silva",
   "cpf": "12345678901",
-  "email": "juan@example.com",
+  "email": "joao@exemplo.com",
   "phone": "11999999999",
   "birthday": "2000-01-15",
-  "password": "MiPassword123!"
+  "password": "MinhaSenha123!"
 }
 ```
 
-## 🐛 Problemas Comunes
+## 🐛 Problemas Comuns
 
-### Error: "password authentication failed"
-- Verifica que la contraseña en `.env` sea correcta
-- Asegúrate de que el usuario tenga permisos en PostgreSQL
+### Erro: "password authentication failed"
+- Verifique se a senha no `.env` está correta
+- Certifique-se de que o usuário tenha permissões no PostgreSQL
 
-### Error: "database does not exist"
-- Ejecuta los comandos CREATE DATABASE del paso 3
+### Erro: "database does not exist"
+- Execute os comandos CREATE DATABASE do passo 3
 
-### Error: "relation does not exist"
-- Ejecuta el script `create_tables.sql` del paso 4
+### Erro: "relation does not exist"
+- Execute o script `create_tables.sql` do passo 4
 
-### Los tests fallan con error de conexión
-- Verifica que `.env.test` esté configurado correctamente
-- Asegúrate de que la base de datos `carbonfighters_test` exista
+### Os testes falham com erro de conexão
+- Verifique se o `.env.test` está configurado corretamente
+- Certifique-se de que o banco de dados `carbonfighters_test` existe
 
-## 📞 ¿Necesitas ayuda?
+## 📞 Precisa de ajuda?
 
-Si tienes problemas con la migración:
-1. Revisa el archivo `backend/README.md` para más detalles
-2. Verifica los logs de error
-3. Pregunta en el canal del equipo
+Se você tiver problemas com a migração:
+1. Revise o arquivo `backend/README.md` para mais detalhes
+2. Verifique os logs de erro
+3. Pergunte no canal da equipe
 
-## ✅ Checklist de Migración
+## ✅ Checklist de Migração
 
-- [ ] PostgreSQL instalado y corriendo
-- [ ] Bases de datos `carbonfighters` y `carbonfighters_test` creadas
-- [ ] Tablas creadas con `create_tables.sql`
-- [ ] Archivo `.env` configurado con credenciales correctas
-- [ ] Archivo `.env.test` configurado
-- [ ] Dependencias instaladas (`npm install`)
-- [ ] Servidor corre sin errores (`npm run dev`)
-- [ ] Tests pasan (`npm test`)
+- [ ] PostgreSQL instalado e rodando
+- [ ] Bancos de dados `carbonfighters` e `carbonfighters_test` criados
+- [ ] Tabelas criadas com `create_tables.sql`
+- [ ] Arquivo `.env` configurado com credenciais corretas
+- [ ] Arquivo `.env.test` configurado
+- [ ] Dependências instaladas (`npm install`)
+- [ ] Servidor roda sem erros (`npm run dev`)
+- [ ] Testes passam (`npm test`)
 
-¡Listo! 🎉
+Pronto! 🎉
