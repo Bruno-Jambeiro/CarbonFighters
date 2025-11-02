@@ -3,18 +3,19 @@ import { Link, useNavigate } from 'react-router-dom';
 import FormInput from '../components/forms/formInput';
 import FormSubmitButton from '../components/forms/formSubmitButton';
 import carbonFightersLogo from '../assets/carbonfighters.png';
+import { authApi, saveAuthData } from '../services/api';
 
 
 const Login: React.FC = () => {
   const navigate = useNavigate();
 
   const [formData, setFormData] = useState({
-    email: '',
+    identifier: '', // Can be CPF or Email
     password: ''
   });
 
   const [errors, setErrors] = useState({
-    email: '',
+    identifier: '',
     password: ''
   });
 
@@ -37,22 +38,17 @@ const Login: React.FC = () => {
   };
 
   const validateForm = () => {
-    const newErrors = { email: '', password: '' };
+    const newErrors = { identifier: '', password: '' };
     let isValid = true;
 
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
-      isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Email is invalid';
+    if (!formData.identifier) {
+      newErrors.identifier = 'CPF or Email is required';
       isValid = false;
     }
+    // No need to validate format here - backend will handle it
 
     if (!formData.password) {
       newErrors.password = 'Password is required';
-      isValid = false;
-    } else if (formData.password.length < 6) {
-      newErrors.password = 'Password must be at least 6 characters';
       isValid = false;
     }
 
@@ -65,27 +61,33 @@ const Login: React.FC = () => {
 
     if (validateForm()) {
       setIsLoading(true);
-      const response = (await fetch('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(formData),
-      }));
+      try {
+        // Determine if identifier is CPF (only digits) or email (contains @)
+        const isCpf = /^\d+$/.test(formData.identifier);
+        
+        const loginData = {
+          ...(isCpf ? { cpf: formData.identifier } : { email: formData.identifier }),
+          password: formData.password,
+        };
 
-      if (response.ok) {
-        const data = await response.json();
-        console.log('Login successful, saving token: ', data.token);
+        const data = await authApi.login(loginData);
 
-        localStorage.setItem("token", data.token)
-        navigate("/dashboard")
-      } else {
-        const errorData = await response.json();
-        console.error('Login failed: ', errorData.error);
-        // Handle login failure (e.g., show error message)
+        console.log('Login successful:', data);
+        
+        // Save token and user data
+        saveAuthData(data.token, data.user);
+        
+        navigate("/dashboard");
+      } catch (error) {
+        console.error('Login error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Login failed';
+        setErrors({
+          identifier: errorMessage,
+          password: ''
+        });
+      } finally {
+        setIsLoading(false);
       }
-
-      setIsLoading(false);
     }
   };
 
@@ -95,9 +97,9 @@ const Login: React.FC = () => {
       <div className="flex items-center justify-center lg:w-1/2 w-full h-full">
         <div className="flex flex-col gap-8 w-full max-w-md">
           <div className="text-center">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <Link to="/" className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 hover:bg-green-200 transition-colors cursor-pointer">
               <img src={carbonFightersLogo} alt="Carbon Fighters Logo" />
-            </div>
+            </Link>
             <h2 className="mb-2 text-4xl font-bold text-gray-900 leading-tight">
               Welcome back to Carbon Fighters
             </h2>
@@ -108,13 +110,13 @@ const Login: React.FC = () => {
 
           <form className="flex flex-col gap-6" onSubmit={handleSubmit}>
             <FormInput
-              id="email"
-              name="Email Address"
-              autoComplete='email'
-              value={formData.email}
+              id="identifier"
+              name="CPF or Email"
+              autoComplete='username'
+              value={formData.identifier}
               onChange={handleChange}
-              placeholder="Enter your email"
-              error={errors.email}
+              placeholder="Enter your CPF or Email"
+              error={errors.identifier}
             />
             <FormInput
               id="password"
@@ -137,9 +139,18 @@ const Login: React.FC = () => {
 
             <FormSubmitButton disabled={isLoading}>Sign In</FormSubmitButton>
 
-            <div className="text-center text-gray-500 text-base">
-              Don't have an account?{' '}
-              <Link to="/signup" className="font-medium text-green-500 hover:text-green-600">Sign up here</Link>
+            <div className="flex flex-col gap-3">
+              <div className="text-center text-gray-500 text-base">
+                Don't have an account?{' '}
+                <Link to="/signup" className="font-medium text-green-500 hover:text-green-600">Sign up here</Link>
+              </div>
+              
+              <Link 
+                to="/" 
+                className="text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                ← Back to Home
+              </Link>
             </div>
           </form>
         </div>
