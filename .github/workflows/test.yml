@@ -13,6 +13,22 @@ jobs:
   test:
     runs-on: ubuntu-latest
 
+    # Configurar servicio de PostgreSQL
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: postgres
+          POSTGRES_PASSWORD: postgres
+          POSTGRES_DB: carbonfighters_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     strategy:
       matrix:
         node-version: [20.x] # specify Node.js version
@@ -31,3 +47,12 @@ jobs:
 
       - name: Run Tests
         run: cd backend && npm test
+        env:
+          NODE_ENV: github-actions
+          DB_USER: postgres
+          DB_HOST: localhost
+          DB_DATABASE: carbonfighters_test
+          DB_PASSWORD: postgres
+          DB_PORT: 5432
+          PORT: 3001
+          TOKEN_SECRET: test-secret-key-for-github-actions

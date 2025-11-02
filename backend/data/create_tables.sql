@@ -1,15 +1,18 @@
 CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY AUTOINCREMENT,
-    firstName TEXT NOT NULL,
-    lastName TEXT NOT NULL,
-    email TEXT NOT NULL UNIQUE,
-    password TEXT NOT NULL,
-    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    id_user SERIAL PRIMARY KEY,
+    firstName VARCHAR(100) NOT NULL,
+    lastName VARCHAR(100) NOT NULL,
+    cpf VARCHAR(14) NOT NULL UNIQUE,
+    email VARCHAR(150) UNIQUE,
+    phone VARCHAR(20),
+    birthday DATE,
+    created_at DATE DEFAULT CURRENT_TIMESTAMP,
+    password VARCHAR(255) NOT NULL
 );
 
 CREATE TABLE IF NOT EXISTS follows (
-    follower_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    followed_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    follower_id INTEGER REFERENCES users(id_user) ON DELETE CASCADE,
+    followed_id INTEGER REFERENCES users(id_user) ON DELETE CASCADE,
     PRIMARY KEY (follower_id, followed_id)
 );
 

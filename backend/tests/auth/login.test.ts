@@ -6,12 +6,15 @@ describe('Login Endpoint', () => {
     let exampleUser = {
         firstName: "Test",
         lastName: "User",
-        email: "user@email.com",
+        cpf: "11122233344",
+        email: "loginuser@email.com",
+        phone: "11988887777",
+        birthday: "1995-05-20",
         password: "Strongpwd@1",
     }
 
     beforeAll(async () => {
-        // Register a user to ensure the user exists
+        // Register a user to ensure the user exists for login tests
         let createdUser = await request(app)
             .post('/auth/register')
             .send(exampleUser);

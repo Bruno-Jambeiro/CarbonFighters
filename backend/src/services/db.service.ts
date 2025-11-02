@@ -1,22 +1,31 @@
-import sqlite3 from 'sqlite3';
-import { open, Database } from 'sqlite';
+import { Pool } from 'pg';
 
-let dbPromise: Promise<Database<sqlite3.Database, sqlite3.Statement>> | null = null;
-let filename: string = './data/database.sqlite';
+let pool: Pool | null = null;
 
-export function setDbFilename(newFilename: string) {
-    if (dbPromise) {
-        throw new Error("Database has already been initialized.");
-    }
-    filename = newFilename;
-}
+export function getDb(): Pool {
+    if (!pool) {
+        pool = new Pool({
+            user: process.env.DB_USER,
+            host: process.env.DB_HOST,
+            database: process.env.DB_DATABASE,
+            password: process.env.DB_PASSWORD,
+            port: parseInt(process.env.DB_PORT || '5432'),
+        });
 
-export function getDb() {
-    if (!dbPromise) {
-        dbPromise = open({
-            filename,
-            driver: sqlite3.Database
+        pool.on('error', (err) => {
+            console.error('Unexpected error on idle client', err);
+            process.exit(-1);
         });
     }
-    return dbPromise;
+    return pool;
+}
+
+export async function query(text: string, params?: any[]) {
+    const client = await getDb().connect();
+    try {
+        const result = await client.query(text, params);
+        return result;
+    } finally {
+        client.release();
+    }
 }

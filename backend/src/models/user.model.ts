@@ -1,8 +1,11 @@
 export interface User {
-    id: number;
+    id_user: number;
     firstName: string;
     lastName: string;
-    email: string;
+    cpf: string;
+    email?: string;
+    phone?: string;
+    birthday?: Date;
     password: string;
     created_at: Date;
 }
