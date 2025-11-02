@@ -47,7 +47,7 @@ describe('Login Endpoint', () => {
                 password: "WrongPassword@1",
             });
         expect(response.status).toBe(401); // 401 means "Unauthorized"
-        expect(response.body).toHaveProperty('error', 'Invalid email or password');
+        expect(response.body).toHaveProperty('error', 'Invalid credentials');
     });
 
     // Test case for non-existent user
@@ -59,6 +59,6 @@ describe('Login Endpoint', () => {
                 password: exampleUser.password,
             });
         expect(response.status).toBe(401); // 401 means "Unauthorized"
-        expect(response.body).toHaveProperty('error', 'Invalid email or password');
+        expect(response.body).toHaveProperty('error', 'Invalid credentials');
     });
 });

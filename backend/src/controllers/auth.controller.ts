@@ -72,21 +72,27 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
 
 export async function login(req: Request, res: Response) {
     try {
-        const { email, password } = req.body;
+        const { cpf, email, password } = req.body;
 
-        // Basic validation
-        if (!email || !password)
-            return res.status(400).json({ error: "Email and password are required" });
+        // Basic validation - require either cpf or email
+        if ((!cpf && !email) || !password)
+            return res.status(400).json({ error: "CPF or Email and password are required" });
 
-        // Find user by email
-        const user = await userService.getUser(email);
+        // Find user by CPF or email
+        let user;
+        if (cpf) {
+            user = await userService.getUserByCpf(cpf);
+        } else if (email) {
+            user = await userService.getUser(email);
+        }
+
         if (!user)
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({ error: "Invalid credentials" });
 
         // Compare password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch)
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({ error: "Invalid credentials" });
 
         // Respond with success
         return res.status(200).json({

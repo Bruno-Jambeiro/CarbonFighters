@@ -14,8 +14,8 @@ beforeAll(async () => {
         await query(`
             CREATE TABLE users (
                 id_user SERIAL PRIMARY KEY,
-                firstName VARCHAR(100) NOT NULL,
-                lastName VARCHAR(100) NOT NULL,
+                first_name VARCHAR(100) NOT NULL,
+                last_name VARCHAR(100) NOT NULL,
                 cpf VARCHAR(14) NOT NULL UNIQUE,
                 email VARCHAR(150) UNIQUE,
                 phone VARCHAR(20),
