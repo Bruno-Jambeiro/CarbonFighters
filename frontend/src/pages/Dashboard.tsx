@@ -140,6 +140,81 @@ export default function Dashboard() {
                         </button>
                     </div>
                 </div>
+
+                {/* Recent Activity */}
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+                    <div className="bg-white rounded-xl shadow-lg p-8">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activities</h2>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg">
+                                <div className="bg-green-500 rounded-full p-2">
+                                    <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                    </svg>
+                                </div>
+                                <div className="flex-1">
+                                    <h3 className="font-semibold text-gray-900">No activities yet</h3>
+                                    <p className="text-sm text-gray-600 mt-1">Start logging your eco-friendly actions!</p>
+                                    <p className="text-xs text-gray-500 mt-2">Get started by clicking "Log Activity" above</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div className="bg-white rounded-xl shadow-lg p-8">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Environmental Tips</h2>
+                        <div className="space-y-4">
+                            <div className="flex items-start gap-4 p-4 bg-blue-50 rounded-lg border-l-4 border-blue-500">
+                                <svg className="h-6 w-6 text-blue-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                                </svg>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900">Use reusable bags</h3>
+                                    <p className="text-sm text-gray-600 mt-1">Reduce plastic waste by bringing your own bags when shopping.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                                <svg className="h-6 w-6 text-green-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                                </svg>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900">Save energy</h3>
+                                    <p className="text-sm text-gray-600 mt-1">Turn off lights and unplug devices when not in use.</p>
+                                </div>
+                            </div>
+                            <div className="flex items-start gap-4 p-4 bg-purple-50 rounded-lg border-l-4 border-purple-500">
+                                <svg className="h-6 w-6 text-purple-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                </svg>
+                                <div>
+                                    <h3 className="font-semibold text-gray-900">Reduce water usage</h3>
+                                    <p className="text-sm text-gray-600 mt-1">Take shorter showers and fix leaky faucets.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Weekly Challenge */}
+                <div className="bg-gradient-to-r from-orange-400 to-pink-500 rounded-xl shadow-lg p-8 mt-8 text-white">
+                    <div className="flex items-center justify-between flex-wrap gap-4">
+                        <div>
+                            <h2 className="text-2xl font-bold mb-2">🏆 Weekly Challenge</h2>
+                            <p className="text-orange-100">Log 5 eco-friendly activities this week!</p>
+                            <div className="mt-4">
+                                <div className="bg-white bg-opacity-20 rounded-full h-3 w-64">
+                                    <div className="bg-white rounded-full h-3 w-0"></div>
+                                </div>
+                                <p className="text-sm mt-2 text-orange-100">0 / 5 activities completed</p>
+                            </div>
+                        </div>
+                        <div className="bg-white bg-opacity-20 rounded-full p-4">
+                            <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                            </svg>
+                        </div>
+                    </div>
+                </div>
             </div>
 
             <Footer />
