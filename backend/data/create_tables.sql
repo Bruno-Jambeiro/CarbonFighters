@@ -25,3 +25,23 @@ FROM
         AND f1.followed_id = f2.follower_id
 WHERE
     f1.follower_id < f1.followed_id;
+
+
+CREATE TABLE IF NOT EXISTS activities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    activity_type INTEGER NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES user(id),
+    validated_by INTEGER REFERENCES user(id) DEFAULT NULL -- Initially null. When another user validates this activity it will be assigned to that user's id
+);
+
+CREATE TABLE IF NOT EXISTS communities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    is_public INTEGER NOT NULL DEFAULT 0,
+    community_type INTEGER NOT NULL -- Defines if it is cooperative, competitive, etc.
+);
+
+CREATE TABLE IF NOT EXISTS user_communities (
+    user_id INTEGER REFERENCES users(id),
+    community_id INTEGER REFERENCES communities(id),
+    PRIMARY KEY (user_id, community_id)
+);
