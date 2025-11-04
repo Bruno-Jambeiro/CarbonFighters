@@ -13,17 +13,25 @@ export default function DashboardHeader({ onToggleSidebar }: DashboardHeaderProp
     <header className="bg-white shadow-sm p-4">
       <div className="flex items-center justify-between">
         
-        {/* Hamburger Button */}
-        <button
-          onClick={onToggleSidebar}
-          className="text-gray-700 p-2 rounded-md hover:bg-green-100"
-        >
-          <Bars3Icon className="h-6 w-6" />
-        </button>
+        {/* Left: Hamburger Menu, Logo and Title */}
+        <div className="flex items-center gap-3">
+          {/* Hamburger Button */}
+          <button
+            onClick={onToggleSidebar}
+            className="text-gray-700 p-2 rounded-md hover:bg-green-100"
+          >
+            <Bars3Icon className="h-6 w-6" />
+          </button>
 
-        <h1 className="text-xl font-bold text-green-800">CarbonFighters</h1>
+          <img
+            src="/logo.png"
+            alt="CarbonFighters Logo"
+            className="h-10 w-10 object-contain"
+          />
+          <h1 className="text-3xl font-bold text-green-800">CarbonFighters</h1>
+        </div>
 
-        {/* 2. Wrap the icon div with the Link component */}
+        {/* Right: Profile Picture */}
         <Link to="/profile">
           <div className="w-10 h-10 bg-gray-300 rounded-full cursor-pointer hover:opacity-80 transition-opacity">
             {/* User image here */}
