@@ -13,7 +13,7 @@ export async function getUser(email: string): Promise<User | null> {
     const row = await db.get<User>('SELECT * FROM users WHERE email = ?;', [email]);
 
     return row || null;
-};
+}
 
 export async function createUser(user: Omit<User, 'id' | 'created_at'>): Promise<User | null> {
     const db = await getDb();
@@ -24,7 +24,7 @@ export async function createUser(user: Omit<User, 'id' | 'created_at'>): Promise
     );
 
     return await getUser(user.email);
-};
+}
 
 export async function getUserById(userId: number): Promise<User | null> {
     const db = await getDb();
