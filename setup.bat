@@ -85,6 +85,4 @@ echo    • Stop databases:      docker-compose stop
 echo    • View logs:           docker logs carbonfighters-db
 echo    • Connect to DB:       docker exec -it carbonfighters-db psql -U carbonfighters_user -d carbonfighters
 echo.
-echo 📖 For more help, see DOCKER_SETUP.md
-echo.
 pause
