@@ -1,6 +1,9 @@
-import { getDb, query } from "../src/services/db.service";
+import { getDb, query, resetPool } from "../src/services/db.service";
 
 beforeAll(async () => {
+    // Reset the pool to ensure we use test configuration
+    resetPool();
+    
     // For tests, we use the same PostgreSQL connection
     // but ensure tables are clean before running tests
     
