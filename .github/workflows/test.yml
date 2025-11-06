@@ -48,11 +48,13 @@ jobs:
       - name: Run Tests
         run: cd backend && npm test
         env:
-          NODE_ENV: github-actions
+          NODE_ENV: test
           DB_USER: postgres
           DB_HOST: localhost
           DB_DATABASE: carbonfighters_test
+          DB_DATABASE_TEST: carbonfighters_test
           DB_PASSWORD: postgres
           DB_PORT: 5432
+          DB_PORT_TEST: 5432
           PORT: 3001
           TOKEN_SECRET: test-secret-key-for-github-actions
