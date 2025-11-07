@@ -6,17 +6,21 @@ Gamified sustainability platform: earn points for eco-friendly actions and reduc
 
 ## 🎯 **Quick Setup (2 minutes)**
 
-**👉 New to the project?** Read: [QUICK_START.md](./QUICK_START.md) (Portuguese)
+**👉 New to the project?** Read: [QUICK_START.md](./QUICK_START.md)
 
 **TL;DR:**
 ```bash
 git clone https://github.com/Bruno-Jambeiro/CarbonFighters.git
-cd CarbonFighters
-cd backend && npm install
-cd ../frontend && npm install
+cd CarbonFighters/backend
+npm install
+npm test                    # Should pass 30 tests ✅
+
+cd ../frontend
+npm install
+npm run dev                 # Frontend at http://localhost:5173
 ```
 
-**That's it!** No Docker or database setup needed - SQLite works out of the box.
+**That's it!** No Docker or database setup needed - SQLite creates tables automatically on first run.
 
 ---
 
@@ -53,10 +57,10 @@ Learn about:
 - **Node.js** - JavaScript runtime
 - **Express** - Minimalist web framework
 - **TypeScript** - Strongly typed JavaScript
-- **SQLite** - Embedded relational database (zero-config)
-- **bcrypt** - Password hashing (7 salt rounds)
+- **SQLite** - Embedded relational database (zero-config, auto-initialization)
+- **bcrypt** - Password hashing (10 salt rounds)
 - **jsonwebtoken** - JWT authentication
-- **better-sqlite3** - Fast synchronous SQLite driver
+- **sqlite + sqlite3** - Async SQLite driver with promises
 
 ### Testing & Development
 - **Jest** - Testing framework
@@ -108,7 +112,7 @@ The project uses a **Layered Architecture** combined with **separation of concer
 ├─────────────────────────────────────────┤
 │   Data Layer (DB Service)              │  ← Data access abstraction
 ├─────────────────────────────────────────┤
-│   Persistence Layer (PostgreSQL)       │  ← Storage layer
+│   Persistence Layer (SQLite)           │  ← Embedded database
 └─────────────────────────────────────────┘
 ```
 
@@ -116,7 +120,7 @@ The project uses a **Layered Architecture** combined with **separation of concer
 - **Routes Layer** - Defines endpoints and maps to controllers (`/auth`, `/actions`, `/groups`)
 - **Controllers Layer** - Orchestrates business flows, validations, and HTTP responses
 - **Services Layer** - Reusable domain logic (User, Token, Actions, Leaderboard)
-- **DB Service** - Singleton PostgreSQL connection pool with parameterized queries
+- **DB Service** - Singleton SQLite connection with auto-initialization and query abstraction
 - **Models** - TypeScript interfaces for data contracts
 
 #### Frontend: Component-Based Architecture
@@ -140,10 +144,23 @@ frontend/src/
 ### Design Patterns
 
 **Implemented:**
-- ✅ **Singleton Pattern** - DB Service with single connection pool
-- ✅ **Service Layer Pattern** - Business logic separation
+- ✅ **Singleton Pattern** - DB Service ensures single database connection instance
+  - Location: [`db.service.ts`](backend/src/services/db.service.ts)
+  - Benefit: Prevents multiple database connections, manages connection lifecycle
+  - Implementation: Uses module-level `dbPromise` variable with lazy initialization
+  
+- ✅ **Service Layer Pattern** - Business logic separated from controllers
+  - Location: [`user.service.ts`](backend/src/services/user.service.ts), [`token.service.ts`](backend/src/services/token.service.ts)
+  - Benefit: Reusable business logic, testable in isolation, clear separation of concerns
+  
 - ✅ **Repository Pattern** (implicit) - User Service abstracts data access
+  - Location: [`user.service.ts`](backend/src/services/user.service.ts)
+  - Benefit: Decouples business logic from data access, easier to switch databases
+  
 - ✅ **Component Pattern** - Reusable and composable React components
+  - Location: [`frontend/src/components/`](frontend/src/components/)
+  - Examples: `FormInput`, `PasswordStrengthBar`, `FormSubmitButton`
+  - Benefit: Code reusability, consistent UI, easier maintenance
 
 **Planned:**
 - 🔄 **Strategy Pattern** - Points calculation with different strategies per action type
@@ -196,7 +213,7 @@ C4Container
         
         Container(api, "REST API", "Node.js + Express + TypeScript", "Provides authentication, user management, and business logic functionality via JSON/HTTPS")
         
-        ContainerDb(db, "Database", "PostgreSQL", "Stores users, sustainable actions, points, badges, groups, challenges, and social relationships")
+        ContainerDb(db, "Database", "SQLite", "Stores users, sustainable actions, points, badges, groups, challenges, and social relationships")
     }
 
     System_Ext(browser, "Web Browser", "Chrome, Firefox, Safari")
@@ -206,7 +223,7 @@ C4Container
     
     Rel(spa, api, "Makes API calls", "JSON/HTTPS [port 3000]")
     
-    Rel(api, db, "Reads/Writes", "SQL via pg driver [port 5432]")
+    Rel(api, db, "Reads/Writes", "SQL via sqlite driver [file: ./data/database.sqlite]")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
@@ -238,7 +255,7 @@ C4Component
         Component(userModel, "User Model", "TypeScript Interface", "Defines User contract: id_user, firstName, lastName, cpf, email, password, etc.")
     }
     
-    ContainerDb_Ext(postgres, "PostgreSQL Database", "PostgreSQL 14+", "Stores users table with indexes on email and cpf")
+    ContainerDb_Ext(sqlite, "SQLite Database", "SQLite 3", "File-based database at ./data/database.sqlite with auto-initialized schema")
     
     Container_Ext(frontend, "React SPA", "Client consuming the API")
 
@@ -250,7 +267,7 @@ C4Component
     Rel(authController, tokenService, "Uses", "generateToken()")
     Rel(userService, dbService, "Executes queries", "query(sql, params)")
     Rel(userService, userModel, "Returns/receives", "User interface")
-    Rel(dbService, postgres, "Pool.query()", "SQL via pg driver")
+    Rel(dbService, sqlite, "db.all() / db.run()", "SQL via sqlite driver (async)")
 
     UpdateLayoutConfig($c4ShapeInRow="3", $c4BoundaryInRow="1")
 ```
@@ -309,138 +326,30 @@ auth.controller.register()
 ├─ validateEmailFormat() ────────────┐
 ├─ validatePasswordStrength() ───────┤ validations.utils.ts
 └─ user.service.createUser() ────────┤ user.service.ts
-    └─ db.service.query() ───────────┤ db.service.ts (PostgreSQL Pool)
-        └─ INSERT INTO users ────────┘ 
+    └─ db.service.query() ───────────┤ db.service.ts (SQLite Singleton)
+        └─ INSERT INTO users ────────┘ Auto-creates schema if needed
   ↓
 token.service.generateToken() ───────┐ token.service.ts (JWT)
   ↓
 Response: { user, token }
 ```
 
+**Database Service Features:**
+- **Singleton Pattern**: Single database connection managed throughout application lifecycle
+- **Auto-initialization**: Tables and views created automatically on first connection
+- **Test/Dev Separation**: Uses `:memory:` for tests, `./data/database.sqlite` for development
+- **Query Abstraction**: Handles SQLite-specific syntax (e.g., simulates `RETURNING` clause)
+
 ## 🚀 Getting Started
 
 ### Prerequisites
 
-Choose **one** of the following options:
-
-#### Option 1: Docker (Recommended - 30 seconds setup) 🐳
-
-- **Docker Desktop** - [Download here](https://www.docker.com/products/docker-desktop/)
-  - Windows/Mac: Install Docker Desktop
-  - Linux: Install `docker` and `docker-compose`
-
-**Advantages:**
-- ✅ Zero database configuration
-- ✅ Works identically on all machines
-- ✅ Isolated environment (doesn't affect your system)
-- ✅ Automatic table creation
-
-#### Option 2: Traditional Setup (Manual PostgreSQL)
-
 - **Node.js 18+** - [Download here](https://nodejs.org/)
-- **PostgreSQL 14+** - [Download here](https://www.postgresql.org/download/)
 - **npm** or **yarn** - Package manager (comes with Node.js)
 
----
-
-## 🐳 Quick Start with Docker (Recommended)
-
-**⚠️ CRITICAL: Don't skip step 2!** Create `.env` files or nothing will work.
-
-```bash
-# 1. Clone
-git clone https://github.com/Bruno-Jambeiro/CarbonFighters.git
-cd CarbonFighters
-
-# 2. Create environment files (REQUIRED!)
-cd backend
-cp .env.example .env
-cp .env.example .env.test
-cd ..
-
-# 3. Start databases
-docker-compose up -d
-
-# 4. Install dependencies
-cd backend && npm install
-cd ../frontend && npm install
-```
-
-**Verify it works:**
-```bash
-docker-compose ps        # Should show 2 containers "Up (healthy)"
-cd backend && npm test   # Should show "30 passed"
-```
-
-**For detailed instructions:** See [QUICK_START.md](./QUICK_START.md)
-
-**For security best practices:** See [SECURITY.md](./SECURITY.md)
+That's it! No database installation needed - SQLite is embedded.
 
 ---
-
-## 🔧 Manual Setup (Without Docker)
-
-**Not recommended.** PostgreSQL setup takes 1-2 hours vs 5 minutes with Docker.
-
-If you really want to:
-- Development database on port **5432**
-- Test database on port **5433**
-- All tables automatically created
-
-### Continue with Backend and Frontend
-
-```bash
-# Backend setup
-cd backend
-npm install
-npm run dev    # Backend running at http://localhost:3000
-
-# Frontend setup (in a new terminal)
-cd frontend
-npm install
-npm run dev    # Frontend running at http://localhost:5173
-```
-
-### Useful Docker Commands
-
-```bash
-# Check databases are running
-docker-compose ps
-
-# View database logs
-docker logs carbonfighters-db
-
-# Stop databases
-docker-compose stop
-
-# Start databases (if already created)
-docker-compose start
-
-# Restart databases
-docker-compose restart
-
-# Remove everything (⚠️ deletes all data)
-docker-compose down -v
-
-# Connect to database (psql)
-docker exec -it carbonfighters-db psql -U carbonfighters_user -d carbonfighters
-```
-
-### Troubleshooting
-
-**Port already in use?**
-```bash
-# Stop local PostgreSQL first
-# Windows: Stop PostgreSQL service
-# macOS: brew services stop postgresql
-# Linux: sudo systemctl stop postgresql
-```
-
-**For detailed Docker instructions, see:** [📖 DOCKER_SETUP.md](./DOCKER_SETUP.md)
-
----
-
-## 🔧 Manual Setup (Without Docker)
 
 ### Backend Setup
 
@@ -451,7 +360,7 @@ cd backend
 npm install
 ```
 
-#### 2. Configure Environment Variables
+#### 2. Configure Environment Variables (Optional)
 
 Create a `.env` file in the `backend/` directory:
 
@@ -463,42 +372,25 @@ PORT=3000
 JWT_SECRET=your-super-secret-key-change-in-production
 JWT_EXPIRATION=1h
 
-# PostgreSQL Configuration
-DB_USER=postgres
-DB_HOST=localhost
-DB_DATABASE=carbonfighters
-DB_PASSWORD=your-password
-DB_PORT=5432
+# Database (optional - defaults to ./data/database.sqlite)
+DB_PATH=./data/database.sqlite
 ```
 
 **⚠️ Security Note:** Never commit `.env` files to version control. Use strong, unique secrets in production.
 
-#### 3. Initialize PostgreSQL Database
-
-```bash
-# Create the database (run in PostgreSQL)
-psql -U postgres
-CREATE DATABASE carbonfighters;
-\q
-
-# Run the schema creation script
-psql -U postgres -d carbonfighters -f data/create_tables.sql
-```
-
-Alternatively, the tables will be created automatically on first run if using migrations.
-
-#### 4. Run the Backend in Development Mode
+#### 3. Run the Backend
 
 ```bash
 npm run dev
 # Server running at: http://localhost:3000
+# Database auto-created at ./data/database.sqlite
 ```
 
 **Available Scripts:**
 - `npm run dev` - Run with hot reload (ts-node-dev)
 - `npm run build` - Compile TypeScript to JavaScript
 - `npm start` - Run compiled production build
-- `npm test` - Run test suite with Jest
+- `npm test` - Run test suite with Jest (uses in-memory SQLite)
 
 ### Frontend Setup
 
@@ -731,19 +623,11 @@ cd backend
 npm test
 ```
 
-**Test Structure:**
-```
-backend/tests/
-├── setup.ts              # Test configuration
-└── auth/
-    ├── register.test.ts  # Registration endpoint tests
-    └── login.test.ts     # Login endpoint tests
-```
-
-**Test Environment:**
-- Uses `.env.test` for test-specific configuration
-- Separate test database to avoid polluting development data
-- Automatic cleanup after tests
+**Test Features:**
+- Uses in-memory SQLite (`:memory:`) for fast, isolated tests
+- Automatic schema initialization
+- 30 tests covering authentication endpoints
+- No cleanup needed - database destroyed after each test suite
 
 **Running Tests:**
 ```bash
@@ -786,114 +670,6 @@ npm run preview           # Preview production build
 - Executes: Backend test suite
 - Checks: Code compilation, test coverage
 ```
-
-## 🗺️ Roadmap
-
-### ✅ Completed
-- [x] User authentication (register/login with JWT)
-- [x] PostgreSQL database integration
-- [x] Password hashing with bcrypt
-- [x] Email and CPF validation
-- [x] Frontend routing (React Router)
-- [x] Responsive UI with Tailwind CSS
-- [x] Form components with validation
-- [x] Protected routes (Dashboard)
-
-### 🚧 In Progress
-- [ ] User profile management
-- [ ] Dashboard main body implementation
-- [ ] Action logging system
-
-### 📋 Planned Features
-
-#### Phase 1: Core Gamification (MVP)
-- [ ] **Sustainable Actions Catalog**
-  - Predefined eco-friendly actions with point values
-  - Categories: Transport, Energy, Food, Waste, Water
-  - Manual action logging
-  
-- [ ] **Points System**
-  - Award "Eco Points" for logged actions
-  - Points history and statistics
-  - Daily streak tracking
-
-- [ ] **Badges & Achievements**
-  - Streak badges (7 days, 30 days, 100 days)
-  - Milestone badges (100 actions, 1000 points, etc.)
-  - Special event badges
-
-#### Phase 2: Social Features
-- [ ] **Follow System**
-  - Follow/unfollow users
-  - Friends view (mutual follows)
-  - Activity feed from friends
-
-- [ ] **Groups & Challenges**
-  - User-created groups (public/private/invite-only)
-  - Time-bound challenges with winners
-  - Ongoing clubs for long-term accountability
-  - Group chat integration
-
-- [ ] **Leaderboards**
-  - Global leaderboard (all users)
-  - Friends leaderboard
-  - Group-specific leaderboards
-  - Real-time ranking updates
-
-#### Phase 3: Verification & Trust
-- [ ] **Photo Evidence**
-  - Upload photos for action verification
-  - "Pics or it didn't happen" mechanism
-  - Social proof on activity feed
-  - Cloud storage integration (AWS S3/Cloudinary)
-
-- [ ] **Action Validation**
-  - Community reporting for fake actions
-  - Admin moderation tools
-  - Automated fraud detection
-
-#### Phase 4: Advanced Features
-- [ ] **Carbon Footprint Calculator**
-  - Onboarding questionnaire
-  - Personalized baseline calculation
-  - Integration with Carbon API (CarbonInterface/Climatiq)
-  - Progress tracking vs. baseline
-
-- [ ] **Notifications System**
-  - Email notifications (SendGrid/AWS SES)
-  - Challenge invitations
-  - Streak reminders
-  - Badge unlocks
-  - Leaderboard position changes
-
-- [ ] **Analytics Dashboard**
-  - Personal impact metrics (CO₂ saved, trees planted equivalent)
-  - Monthly reports
-  - Comparison with friends
-  - Admin analytics
-
-#### Phase 5: Monetization & Growth
-- [ ] **Premium Features**
-  - Ad-free experience
-  - Exclusive badges
-  - Custom challenge creation
-  - Advanced analytics
-
-- [ ] **Partnerships**
-  - Donate points to environmental NGOs
-  - Brand partnerships for special challenges
-  - Rewards marketplace
-
-### 🔧 Technical Improvements
-- [ ] API rate limiting
-- [ ] Request/response logging (Morgan)
-- [ ] Error tracking (Sentry)
-- [ ] API documentation (Swagger/OpenAPI)
-- [ ] Database migrations system
-- [ ] Docker containerization
-- [ ] CI/CD pipeline improvements
-- [ ] Performance monitoring
-- [ ] WebSocket integration for real-time features
 
 ## 👥 Team
 
