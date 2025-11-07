@@ -5,7 +5,7 @@ import { User } from '../models/user.model';
 import { validatePasswordStrength, validateEmailFormat } from '../utils/validations.utils';
 import { generateToken } from '../services/token.service';
 
-type RegisterBody = Omit<User, 'id_user' | 'created_at'>;
+type RegisterBody = Omit<User, 'id' | 'created_at'>;
 
 export async function register(req: Request<{}, {}, RegisterBody>, res: Response) {
     try {
@@ -62,7 +62,7 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
                 ...newUser,
                 password: undefined // Do not send the password hash back
             },
-            token: generateToken({ id: newUser!.id_user, email: newUser!.email || newUser!.cpf }),
+            token: generateToken({ id: newUser!.id, email: newUser!.email || newUser!.cpf }),
         });
     } catch (err) {
         console.error(err);
@@ -95,7 +95,7 @@ export async function login(req: Request, res: Response) {
                 ...user,
                 password: undefined
             },
-            token: generateToken({ id: user.id_user, email: user.email || user.cpf }),
+            token: generateToken({ id: user.id, email: user.email || user.cpf }),
         });
     } catch (err) {
         console.error(err);

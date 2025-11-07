@@ -4,7 +4,7 @@ Gamified sustainability platform: earn points for eco-friendly actions and reduc
 
 ---
 
-## 🎯 **Quick Setup (5 minutes)**
+## 🎯 **Quick Setup (2 minutes)**
 
 **👉 New to the project?** Read: [QUICK_START.md](./QUICK_START.md) (Portuguese)
 
@@ -12,10 +12,11 @@ Gamified sustainability platform: earn points for eco-friendly actions and reduc
 ```bash
 git clone https://github.com/Bruno-Jambeiro/CarbonFighters.git
 cd CarbonFighters
-./setup.sh  # or setup.bat on Windows
+cd backend && npm install
+cd ../frontend && npm install
 ```
 
-**That's it!** The script installs everything automatically.
+**That's it!** No Docker or database setup needed - SQLite works out of the box.
 
 ---
 
@@ -37,7 +38,7 @@ Learn about:
 ![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?logo=typescript&logoColor=white&style=for-the-badge)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-38B2AC?logo=tailwindcss&logoColor=white&style=for-the-badge)
 ![Node.js](https://img.shields.io/badge/Node.js-339933?logo=node.js&logoColor=white&style=for-the-badge)
-![PostgreSQL](https://img.shields.io/badge/PostgreSQL-316192?logo=postgresql&logoColor=white&style=for-the-badge)
+![SQLite](https://img.shields.io/badge/SQLite-003B57?logo=sqlite&logoColor=white&style=for-the-badge)
 ![Express](https://img.shields.io/badge/Express-000000?logo=express&logoColor=white&style=for-the-badge)
 ![Vite](https://img.shields.io/badge/Vite-646CFF?logo=vite&logoColor=white&style=for-the-badge)
 
@@ -52,10 +53,10 @@ Learn about:
 - **Node.js** - JavaScript runtime
 - **Express** - Minimalist web framework
 - **TypeScript** - Strongly typed JavaScript
-- **PostgreSQL** - Relational database with advanced features
+- **SQLite** - Embedded relational database (zero-config)
 - **bcrypt** - Password hashing (7 salt rounds)
 - **jsonwebtoken** - JWT authentication
-- **pg (node-postgres)** - PostgreSQL driver with connection pooling
+- **better-sqlite3** - Fast synchronous SQLite driver
 
 ### Testing & Development
 - **Jest** - Testing framework

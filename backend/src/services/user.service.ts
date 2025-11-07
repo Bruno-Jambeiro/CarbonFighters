@@ -8,19 +8,19 @@ export async function getAllUsers(): Promise<User[]> {
 }
 
 export async function getUser(email: string): Promise<User | null> {
-    const result = await query('SELECT * FROM users WHERE email = $1;', [email]);
+    const result = await query('SELECT * FROM users WHERE email = ?;', [email]);
     return result.rows[0] || null;
 }
 
 export async function getUserByCpf(cpf: string): Promise<User | null> {
-    const result = await query('SELECT * FROM users WHERE cpf = $1;', [cpf]);
+    const result = await query('SELECT * FROM users WHERE cpf = ?;', [cpf]);
     return result.rows[0] || null;
 }
 
-export async function createUser(user: Omit<User, 'id_user' | 'created_at'>): Promise<User | null> {
+export async function createUser(user: Omit<User, 'id' | 'created_at'>): Promise<User | null> {
     const result = await query(
         `INSERT INTO users (firstName, lastName, cpf, email, phone, birthday, password) 
-         VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING *;`,
+         VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *;`,
         [user.firstName, user.lastName, user.cpf, user.email, user.phone, user.birthday, user.password]
     );
 
