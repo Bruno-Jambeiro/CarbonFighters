@@ -162,10 +162,46 @@ frontend/src/
   - Examples: `FormInput`, `PasswordStrengthBar`, `FormSubmitButton`
   - Benefit: Code reusability, consistent UI, easier maintenance
 
+- ✅ **Factory Pattern** - Centralized badge creation with extensibility
+  - Location: [`badge.factory.ts`](backend/src/factories/badge.factory.ts)
+  - Model: [`badge.model.ts`](backend/src/models/badge.model.ts)
+  - Tests: [`badge.factory.test.ts`](backend/tests/factories/badge.factory.test.ts) (30 tests, 100% coverage)
+  - Frontend Demo: [`Badges.tsx`](frontend/src/pages/Badges.tsx)
+  - **What it does:** Creates 4 types of badges (STREAK, MILESTONE, SPECIAL, CATEGORY) with specific business logic
+  - **Example Usage:**
+    ```typescript
+    import { BadgeFactory, BadgeType } from '@/factories/badge.factory';
+    
+    // Create a 7-day streak badge
+    const streakBadge = BadgeFactory.createBadge(BadgeType.STREAK, 7);
+    // Returns: { name: "7 Dias de Fogo", icon: "🔥", points: 70, ... }
+    
+    // Create a milestone badge for 100 actions
+    const milestoneBadge = BadgeFactory.createBadge(BadgeType.MILESTONE, 100);
+    // Returns: { name: "Eco Rookie", icon: "🌱", points: 100, ... }
+    
+    // Get all available badge types
+    const types = BadgeFactory.getAvailableBadgeTypes();
+    // Returns: ['streak', 'milestone', 'special', 'category']
+    
+    // Get example badges for demo/testing
+    const examples = BadgeFactory.getExampleBadges();
+    ```
+  - **Benefits:**
+    - ✅ **Single Responsibility:** Badge creation logic centralized in one place
+    - ✅ **Open/Closed Principle:** Easy to extend with new badge types without modifying existing code
+    - ✅ **DRY Principle:** Eliminates duplicate badge creation logic across codebase
+    - ✅ **Maintainability:** Changes to badge logic only need to be made in one file
+    - ✅ **Testability:** Isolated factory can be thoroughly unit tested
+  - **Badge Types Supported:**
+    - � **STREAK** - Consecutive days (7/30/100+ days) → Points = days × 10
+    - 🏆 **MILESTONE** - Action count (10/50/100/500/1000/5000+ actions) → Points = action count
+    - ⭐ **SPECIAL** - Event-based (Dia da Terra, Zero Waste, etc.) → Fixed points per event
+    - 🎖️ **CATEGORY** - Specialization (Transport/Recycling/Water/Energy) → 300 points + 50 actions required
+
 **Planned:**
 - 🔄 **Strategy Pattern** - Points calculation with different strategies per action type
 - 🔄 **Observer Pattern** - Real-time notification system
-- 🔄 **Factory Pattern** - Badges and achievements generation
 
 ## 📐 C4 Diagrams
 

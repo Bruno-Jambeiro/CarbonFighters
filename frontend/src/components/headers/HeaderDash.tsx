@@ -17,7 +17,13 @@ export default function Header() {
           to="/" 
           className="text-gray-700 hover:text-green-600 transition duration-200"
         >
-          Inicio
+          Home
+        </Link>
+        <Link 
+          to="/badges" 
+          className="text-gray-700 hover:text-green-600 transition duration-200 flex items-center gap-1"
+        >
+          🏆 Badges
         </Link>
         <Link 
           to="/about" 
