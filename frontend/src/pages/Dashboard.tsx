@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { getAuthData } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -117,6 +117,78 @@ export default function Dashboard() {
                     </div>
                 </div>
 
+                {/* Badges Showcase - NEW FEATURE! */}
+                <div className="bg-gradient-to-br from-yellow-400 via-orange-400 to-pink-500 rounded-xl shadow-2xl p-8 mb-8 text-white relative overflow-hidden">
+                    {/* Decorative background elements */}
+                    <div className="absolute top-0 right-0 opacity-20">
+                        <div className="text-9xl">🏆</div>
+                    </div>
+                    
+                    <div className="relative z-10">
+                        <div className="flex items-center gap-3 mb-4">
+                            <span className="text-4xl animate-bounce">🎖️</span>
+                            <h2 className="text-3xl font-bold">Your Earned Badges!</h2>
+                        </div>
+                        
+                        <p className="text-yellow-100 mb-6 text-lg">
+                            You've earned <strong className="text-white">3 badges</strong> with a total of <strong className="text-white">670 points</strong>! 🎉
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                            {/* Badge 1 */}
+                            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 border-2 border-white border-opacity-40 hover:bg-opacity-30 transition-all">
+                                <div className="text-center">
+                                    <div className="text-5xl mb-2">🔥</div>
+                                    <h3 className="font-bold text-white mb-1">7 Days Streak</h3>
+                                    <p className="text-xs text-yellow-100 mb-2">7 consecutive days</p>
+                                    <div className="bg-yellow-300 text-yellow-900 text-sm font-bold px-3 py-1 rounded-full inline-block">
+                                        +70 pts
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Badge 2 */}
+                            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 border-2 border-white border-opacity-40 hover:bg-opacity-30 transition-all">
+                                <div className="text-center">
+                                    <div className="text-5xl mb-2">🌱</div>
+                                    <h3 className="font-bold text-white mb-1">Eco Rookie</h3>
+                                    <p className="text-xs text-yellow-100 mb-2">100 actions completed</p>
+                                    <div className="bg-green-300 text-green-900 text-sm font-bold px-3 py-1 rounded-full inline-block">
+                                        +100 pts
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Badge 3 */}
+                            <div className="bg-white bg-opacity-20 backdrop-blur-sm rounded-lg p-4 border-2 border-white border-opacity-40 hover:bg-opacity-30 transition-all">
+                                <div className="text-center">
+                                    <div className="text-5xl mb-2">⭐</div>
+                                    <h3 className="font-bold text-white mb-1">Earth Day 2025</h3>
+                                    <p className="text-xs text-yellow-100 mb-2">Special event</p>
+                                    <div className="bg-purple-300 text-purple-900 text-sm font-bold px-3 py-1 rounded-full inline-block">
+                                        +500 pts
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="flex justify-between items-center">
+                            <div className="text-sm text-yellow-100">
+                                <strong className="text-white">3/12 badges</strong> earned • <strong className="text-white">25%</strong> complete
+                            </div>
+                            <Link 
+                                to="/badges"
+                                className="bg-white text-orange-600 font-bold py-3 px-6 rounded-lg hover:bg-yellow-50 transition-all shadow-lg hover:shadow-xl transform hover:-translate-y-1 flex items-center gap-2"
+                            >
+                                View All Badges
+                                <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
+                                </svg>
+                            </Link>
+                        </div>
+                    </div>
+                </div>
+
                 <div className="bg-white rounded-xl shadow-lg p-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
@@ -126,12 +198,15 @@ export default function Dashboard() {
                             </svg>
                             Log Activity
                         </button>
-                        <button className="bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white font-semibold py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg">
+                        <Link 
+                            to="/badges"
+                            className="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white font-semibold py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg text-center"
+                        >
                             <svg className="h-6 w-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
                             </svg>
-                            View Stats
-                        </button>
+                            My Badges
+                        </Link>
                         <button className="bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white font-semibold py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg">
                             <svg className="h-6 w-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
