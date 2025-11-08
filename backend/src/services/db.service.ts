@@ -1,6 +1,7 @@
 import sqlite3 from 'sqlite3';
 import { open, Database } from 'sqlite';
 import path from 'path';
+import fs from 'fs/promises';
 
 let dbPromise: Promise<Database<sqlite3.Database, sqlite3.Statement>> | null = null;
 let filename: string = './data/database.sqlite';
@@ -52,46 +53,35 @@ export function getDb(): Promise<Database<sqlite3.Database, sqlite3.Statement>> 
 }
 
 async function initializeDatabase(db: Database<sqlite3.Database, sqlite3.Statement>): Promise<void> {
-    // Create users table with improved schema
-    await db.exec(`
-        CREATE TABLE IF NOT EXISTS users (
-            id INTEGER PRIMARY KEY AUTOINCREMENT,
-            firstName TEXT NOT NULL,
-            lastName TEXT NOT NULL,
-            cpf TEXT UNIQUE NOT NULL,
-            email TEXT UNIQUE,
-            phone TEXT,
-            birthday TEXT,
-            password TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-        );
-    `);
+    // Read schema from external SQL file instead of hardcoded statements
+    const candidates = [
+        // When running from compiled JS in dist
+        path.resolve(__dirname, '../../data/create_tables.sql'),
+        // Project root execution (e.g. ts-node / jest from root)
+        path.resolve(process.cwd(), 'backend', 'data', 'create_tables.sql'),
+        // Fallback if working directory already inside backend
+        path.resolve(process.cwd(), 'data', 'create_tables.sql')
+    ];
 
-    // Create follows table for user relationships
-    await db.exec(`
-        CREATE TABLE IF NOT EXISTS follows (
-            follower_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-            followed_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-            PRIMARY KEY (follower_id, followed_id)
-        );
-    `);
+    let ddl: string | null = null;
+    let usedPath: string | null = null;
 
-    // Create friends view (mutual follows)
-    await db.exec(`
-        CREATE VIEW IF NOT EXISTS friends AS
-        SELECT
-            f1.follower_id AS user1_id,
-            f1.followed_id AS user2_id
-        FROM
-            follows f1
-            JOIN follows f2
-                ON f1.follower_id = f2.followed_id
-                AND f1.followed_id = f2.follower_id
-        WHERE
-            f1.follower_id < f1.followed_id;
-    `);
-    
-    console.log('📊 Database schema initialized (users, follows, friends view)');
+    for (const p of candidates) {
+        try {
+            ddl = await fs.readFile(p, 'utf-8');
+            usedPath = p;
+            break;
+        } catch {
+            // try next
+        }
+    }
+
+    if (!ddl) {
+        throw new Error('create_tables.sql not found in expected locations: ' + candidates.join(', '));
+    }
+
+    await db.exec(ddl);
+    console.log(`📊 Database schema initialized from SQL file: ${usedPath}`);
 }
 
 export async function query(sql: string, params?: any[]): Promise<any> {
