@@ -9,23 +9,30 @@ type RegisterBody = Omit<User, 'id' | 'created_at'>;
 
 export async function register(req: Request<{}, {}, RegisterBody>, res: Response) {
     try {
-        const { firstName, lastName, email, password } = req.body;
+        const { firstName, lastName, cpf, email, phone, birthday, password } = req.body;
 
         // Basic validation
-        if (!firstName || !lastName || !email || !password)
-            return res.status(400).json({ error: "All fields are required", received: req.body });
+        if (!firstName || !lastName || !cpf || !password)
+            return res.status(400).json({ error: "firstName, lastName, cpf and password are required", received: req.body });
 
 
-        // Email validation
-        const emailError = validateEmailFormat(email);
-        if (emailError) {
-            return res.status(400).json({ error: emailError });
+        // Email validation (only if provided)
+        if (email) {
+            const emailError = validateEmailFormat(email);
+            if (emailError) {
+                return res.status(400).json({ error: emailError });
+            }
+
+            // Check if email already exists
+            const existingUserByEmail = await userService.getUser(email);
+            if (existingUserByEmail)
+                return res.status(400).json({ error: "Email already registered" });
         }
 
-        // Check if email already exists
-        const existingUser = await userService.getUser(email);
-        if (existingUser)
-            return res.status(400).json({ error: "Email already registered" });
+        // Check if CPF already exists
+        const existingUserByCpf = await userService.getUserByCpf(cpf);
+        if (existingUserByCpf)
+            return res.status(400).json({ error: "CPF already registered" });
 
 
         // Password strength validation
@@ -41,7 +48,10 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
         const newUser = await userService.createUser({
             firstName,
             lastName,
+            cpf,
             email,
+            phone,
+            birthday,
             password: hashedPassword,
         });
 
@@ -52,7 +62,7 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
                 ...newUser,
                 password: undefined // Do not send the password hash back
             },
-            token: generateToken({ id: newUser!.id, email: newUser!.email }),
+            token: generateToken({ id: newUser!.id, email: newUser!.email || newUser!.cpf }),
         });
     } catch (err) {
         console.error(err);
@@ -62,29 +72,36 @@ export async function register(req: Request<{}, {}, RegisterBody>, res: Response
 
 export async function login(req: Request, res: Response) {
     try {
-        const { email, password } = req.body;
+        const { cpf, email, password } = req.body;
 
-        // Basic validation
-        if (!email || !password)
-            return res.status(400).json({ error: "Email and password are required" });
+        // Basic validation - require either cpf or email
+        if ((!cpf && !email) || !password)
+            return res.status(400).json({ error: "CPF or Email and password are required" });
 
-        // Find user by email
-        const user = await userService.getUser(email);
+        // Find user by CPF or email
+        let user;
+        if (cpf) {
+            user = await userService.getUserByCpf(cpf);
+        } else if (email) {
+            user = await userService.getUser(email);
+        }
+
         if (!user)
-            return res.status(401).json({ error: "Invalid email or password" });
+            return res.status(401).json({ error: "Invalid credentials" });
 
         // Compare password
         const isMatch = await bcrypt.compare(password, user.password);
         if (!isMatch)
-            return res.status(401).json({ error: "Invalid email or password" });
-
-        // TODO Create JWT token
+            return res.status(401).json({ error: "Invalid credentials" });
 
         // Respond with success
         return res.status(200).json({
             message: "Login successful",
-            user,
-            token: generateToken({ id: user.id, email: user.email }),
+            user: {
+                ...user,
+                password: undefined
+            },
+            token: generateToken({ id: user.id, email: user.email || user.cpf }),
         });
     } catch (err) {
         console.error(err);

@@ -31,3 +31,8 @@ jobs:
 
       - name: Run Tests
         run: cd backend && npm test
+        env:
+          NODE_ENV: test
+          DB_PATH: ":memory:"
+          PORT: 3001
+          TOKEN_SECRET: test-secret-key-for-github-actions

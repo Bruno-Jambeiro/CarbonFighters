@@ -5,6 +5,7 @@ import FormSubmitButton from '../components/forms/formSubmitButton';
 import PasswordStrengthBar from '../components/passwordStrengthBar';
 import PasswordRequirements from '../components/passwordRequeriments';
 import carbonFightersLogo from '../assets/carbonfighters.png';
+import { authApi, saveAuthData } from '../services/api';
 
 const SignUp: React.FC = () => {
   const navigate = useNavigate();
@@ -12,7 +13,10 @@ const SignUp: React.FC = () => {
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
+    cpf: '',
     email: '',
+    phone: '',
+    birthday: '',
     password: '',
     confirmPassword: ''
   });
@@ -20,7 +24,10 @@ const SignUp: React.FC = () => {
   const [errors, setErrors] = useState({
     firstName: '',
     lastName: '',
+    cpf: '',
     email: '',
+    phone: '',
+    birthday: '',
     password: '',
     confirmPassword: ''
   });
@@ -31,7 +38,7 @@ const SignUp: React.FC = () => {
 
   const checkPasswordRequirements = (password: string) => {
     return password.length >= 8 &&
-      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[a-zA-Z0-9])/.test(password);
+      /(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/.test(password);
   };
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -69,7 +76,10 @@ const SignUp: React.FC = () => {
     const newErrors = {
       firstName: '',
       lastName: '',
+      cpf: '',
       email: '',
+      phone: '',
+      birthday: '',
       password: '',
       confirmPassword: ''
     };
@@ -85,11 +95,23 @@ const SignUp: React.FC = () => {
       isValid = false;
     }
 
-    if (!formData.email) {
-      newErrors.email = 'Email is required';
+    if (!formData.cpf.trim()) {
+      newErrors.cpf = 'CPF is required';
       isValid = false;
-    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+    } else if (!/^\d{11}$/.test(formData.cpf)) {
+      newErrors.cpf = 'CPF must be 11 digits';
+      isValid = false;
+    }
+
+    // Email is optional, but validate format if provided
+    if (formData.email && !/\S+@\S+\.\S+/.test(formData.email)) {
       newErrors.email = 'Email is invalid';
+      isValid = false;
+    }
+
+    // Phone is optional, but validate format if provided
+    if (formData.phone && !/^\d{10,11}$/.test(formData.phone)) {
+      newErrors.phone = 'Phone must be 10-11 digits';
       isValid = false;
     }
 
@@ -99,8 +121,8 @@ const SignUp: React.FC = () => {
     } else if (formData.password.length < 8) {
       newErrors.password = 'Password must be at least 8 characters';
       isValid = false;
-    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/.test(formData.password)) {
-      newErrors.password = 'Password must contain at least one uppercase letter, one lowercase letter, and one number';
+    } else if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])/.test(formData.password)) {
+      newErrors.password = 'Password must contain uppercase, lowercase, number, and special character';
       isValid = false;
     }
 
@@ -122,43 +144,33 @@ const SignUp: React.FC = () => {
     if (validateForm()) {
       setIsLoading(true);
       try {
-        const response = await fetch('/api/auth/register', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            firstName: formData.firstName,
-            lastName: formData.lastName,
-            email: formData.email,
-            password: formData.password,
-          }),
-        });
+        const registerData = {
+          firstName: formData.firstName,
+          lastName: formData.lastName,
+          cpf: formData.cpf,
+          password: formData.password,
+          ...(formData.email && { email: formData.email }),
+          ...(formData.phone && { phone: formData.phone }),
+          ...(formData.birthday && { birthday: formData.birthday }),
+        };
 
-        if (response.ok) {
-          const data = await response.json();
-          // Store token in localStorage or context
-          localStorage.setItem('token', data.token);
-          // Redirect to dashboard or main app
-          console.log('Registration successful:', data);
-
-          navigate("/dashboard")
-        } else {
-          const errorData = await response.json();
-          setErrors({
-            firstName: '',
-            lastName: '',
-            email: errorData.error || 'Registration failed',
-            password: '',
-            confirmPassword: ''
-          });
-        }
+        const data = await authApi.register(registerData);
+        
+        // Save token and user data
+        saveAuthData(data.token, data.user);
+        
+        console.log('Registration successful:', data);
+        navigate("/dashboard");
       } catch (error) {
         console.error('Registration error:', error);
+        const errorMessage = error instanceof Error ? error.message : 'Registration failed';
         setErrors({
           firstName: '',
           lastName: '',
-          email: 'Network error. Please try again.',
+          cpf: '',
+          email: errorMessage,
+          phone: '',
+          birthday: '',
           password: '',
           confirmPassword: ''
         });
@@ -174,9 +186,9 @@ const SignUp: React.FC = () => {
       <div className="flex items-center justify-center p-8 overflow-y-auto lg:w-1/2 w-full h-full">
         <div className="flex flex-col gap-8 w-full max-w-xl">
           <div className="text-center">
-            <div className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
+            <Link to="/" className="mx-auto mb-6 flex h-16 w-16 items-center justify-center rounded-full bg-green-100 hover:bg-green-200 transition-colors cursor-pointer">
               <img src={carbonFightersLogo} alt="Carbon Fighters Logo" />
-            </div>
+            </Link>
             <h2 className="mb-2 text-4xl font-bold text-gray-900 leading-tight">Join Carbon Fighters</h2>
             <p className="text-lg text-gray-500">Create your account and start making a difference</p>
           </div>
@@ -201,13 +213,43 @@ const SignUp: React.FC = () => {
               error={errors.lastName}
             />
             <FormInput
+              id="cpf"
+              name="CPF"
+              autoComplete='off'
+              value={formData.cpf}
+              onChange={handleChange}
+              placeholder="CPF (11 digits)"
+              error={errors.cpf}
+              maxLength={11}
+            />
+            <FormInput
               id="email"
-              name="Email Address"
+              name="Email Address (Optional)"
               autoComplete='email'
               value={formData.email}
               onChange={handleChange}
               placeholder="Enter your email"
               error={errors.email}
+            />
+            <FormInput
+              id="phone"
+              name="Phone (Optional)"
+              autoComplete='tel'
+              value={formData.phone}
+              onChange={handleChange}
+              placeholder="Phone number"
+              error={errors.phone}
+              maxLength={11}
+            />
+            <FormInput
+              id="birthday"
+              name="Birthday (Optional)"
+              type="date"
+              autoComplete='bday'
+              value={formData.birthday}
+              onChange={handleChange}
+              placeholder="YYYY-MM-DD"
+              error={errors.birthday}
             />
 
             {/* Password Requirements Section */}
@@ -247,9 +289,18 @@ const SignUp: React.FC = () => {
               {isLoading ? 'Creating Account...' : 'Create Account'}
             </FormSubmitButton>
 
-            <div className="text-center text-gray-500 text-base">
-              Already have an account?{' '}
-              <Link to="/login" className="font-medium text-green-500 hover:text-green-600">Sign in here</Link>
+            <div className="flex flex-col gap-3">
+              <div className="text-center text-gray-500 text-base">
+                Already have an account?{' '}
+                <Link to="/login" className="font-medium text-green-500 hover:text-green-600">Sign in here</Link>
+              </div>
+              
+              <Link 
+                to="/" 
+                className="text-center text-sm text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                ← Back to Home
+              </Link>
             </div>
           </form>
         </div>

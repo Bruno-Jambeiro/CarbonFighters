@@ -2,7 +2,10 @@ export interface User {
     id: number;
     firstName: string;
     lastName: string;
-    email: string;
+    cpf: string;
+    email?: string;
+    phone?: string;
+    birthday?: string;
     password: string;
-    created_at: Date;
+    created_at: string;
 }

@@ -7,6 +7,7 @@ interface TextInputProps {
     onChange: (e: React.ChangeEvent<HTMLInputElement>) => void;
     placeholder?: string;
     error?: string;
+    maxLength?: number;
 }
 
 export default function FormInput({
@@ -18,6 +19,7 @@ export default function FormInput({
     onChange,
     placeholder,
     error,
+    maxLength,
 }: TextInputProps) {
     return (
         <div className="flex flex-col gap-2">
@@ -32,6 +34,7 @@ export default function FormInput({
                 value={value}
                 onChange={onChange}
                 placeholder={placeholder || name}
+                maxLength={maxLength}
                 className={`w-full bg-white rounded-md border-2 px-4 py-3 text-gray-900 placeholder-gray-400 
                     focus:border-green-500 focus:ring-2 focus:ring-green-500
                     ${error ? 'border-red-500' : 'border-green-500'

@@ -1,27 +1,29 @@
 import { User } from '../models/user.model';
-import { getDb } from './db.service';
+import { query } from './db.service';
 
 
 export async function getAllUsers(): Promise<User[]> {
-    const db = await getDb();
-    const rows = await db.all<User[]>('SELECT * FROM users;');
-    return rows;
+    const result = await query('SELECT * FROM users;');
+    return result.rows;
 }
 
 export async function getUser(email: string): Promise<User | null> {
-    const db = await getDb();
-    const row = await db.get<User>('SELECT * FROM users WHERE email = ?;', [email]);
+    const result = await query('SELECT * FROM users WHERE email = ?;', [email]);
+    return result.rows[0] || null;
+}
 
-    return row || null;
-};
+export async function getUserByCpf(cpf: string): Promise<User | null> {
+    const result = await query('SELECT * FROM users WHERE cpf = ?;', [cpf]);
+    return result.rows[0] || null;
+}
 
 export async function createUser(user: Omit<User, 'id' | 'created_at'>): Promise<User | null> {
-    const db = await getDb();
-
-    await db.run(
-        'INSERT INTO users (firstName, lastName, email,  password) VALUES (?, ?, ?, ?);',
-        [user.firstName, user.lastName, user.email, user.password]
+    const result = await query(
+        `INSERT INTO users (firstName, lastName, cpf, email, phone, birthday, password) 
+         VALUES (?, ?, ?, ?, ?, ?, ?) RETURNING *;`,
+        [user.firstName, user.lastName, user.cpf, user.email, user.phone, user.birthday, user.password]
     );
 
-    return await getUser(user.email);
-};
+    return result.rows[0] || null;
+}
+

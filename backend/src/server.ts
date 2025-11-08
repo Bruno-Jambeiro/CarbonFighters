@@ -1,8 +1,11 @@
 import app from './app';
 import dotenv from 'dotenv';
 
+// Load the correct .env file based on environment
+const envFile = process.env.NODE_ENV === 'test' ? '.env.test' : '.env';
+
 dotenv.config({
-    path: '.env',
+    path: envFile,
     quiet: true
 });
 

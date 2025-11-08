@@ -6,7 +6,10 @@ describe('Register Endpoint', () => {
     let exampleUser = {
         firstName: "Test",
         lastName: "User",
+        cpf: "12345678901",
         email: "user@email.com",
+        phone: "11999999999",
+        birthday: "2000-01-15",
         password: "Strongpwd@1",
     }
 
@@ -33,10 +36,25 @@ describe('Register Endpoint', () => {
         expect(verifyToken(token)).toHaveProperty('email', exampleUser.email);
     });
 
+    it('Should not register a repeated CPF', async () => {
+        const response = await request(app)
+            .post('/auth/register')
+            .send({
+                ...exampleUser,
+                email: "different@email.com"
+            });
+
+        expect(response.status).toBe(400);
+        expect(response.body).toHaveProperty('error', 'CPF already registered');
+    });
+
     it('Should not register a repeated email', async () => {
         const response = await request(app)
             .post('/auth/register')
-            .send(exampleUser);
+            .send({
+                ...exampleUser,
+                cpf: "98765432109"
+            });
 
         expect(response.status).toBe(400);
         expect(response.body).toHaveProperty('error', 'Email already registered');
@@ -49,7 +67,8 @@ describe('Register Endpoint', () => {
                 .post('/auth/register')
                 .send({
                     ...exampleUser,
-                    email: `user${index}@email.com`, // Ensure unique email for each test
+                    cpf: `1111111111${index}`, // Unique CPF for each test (11 digits)
+                    email: `weakpwd${index}@email.com`, // Ensure unique email for each test
                     password
                 });
 
@@ -78,6 +97,7 @@ describe('Register Endpoint', () => {
                 .post('/auth/register')
                 .send({
                     ...exampleUser,
+                    cpf: `2222222222${index}`, // Unique CPF for each test (11 digits)
                     email,
                     password: `Strongpwd@${index}` // Ensure unique password for each test
                 });
@@ -107,6 +127,7 @@ describe('Register Endpoint', () => {
                 .post('/auth/register')
                 .send({
                     ...exampleUser,
+                    cpf: `3333333333${index}`, // Unique CPF for each test (11 digits)
                     email,
                     password: `Strongpwd@${index + 10}` // Ensure unique password for each test
                 });
