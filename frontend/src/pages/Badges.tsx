@@ -8,8 +8,11 @@
  */
 
 import { useState, useEffect } from 'react';
-import HeaderDash from '../components/headers/HeaderDash';
+import { useNavigate } from 'react-router-dom';
+import { getAuthData } from '../services/api';
+//import HeaderDash from '../components/headers/HeaderDash';
 import FooterDash from '../components/footer/FooterDash';
+import Navbar from '../components/Navbar';
 
 // Badge types - must match backend enum
 const BadgeType = {
@@ -34,6 +37,8 @@ interface Badge {
 }
 
 export default function Badges() {
+  const navigate = useNavigate();
+  const [user, setUser] = useState<any>(null);
   const [badges, setBadges] = useState<Badge[]>([]);
   const [userBadges, setUserBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
@@ -42,6 +47,13 @@ export default function Badges() {
 
   useEffect(() => {
     // Get user from localStorage (simulating logged in user)
+    const { token, user: userData } = getAuthData();
+    if (!token || !userData) {
+            navigate('/login');
+            return;
+        }
+        setUser(userData);
+
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
@@ -202,7 +214,7 @@ export default function Badges() {
 
     setUserBadges(earnedBadges);
     setLoading(false);
-  }, []);
+  }, [navigate]);
 
   const filteredBadges = selectedType === 'all' 
     ? badges 
@@ -251,8 +263,8 @@ export default function Badges() {
   }
 
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
-      <HeaderDash />
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex flex-col">
+      <Navbar user={user} />
       
       <main className="flex-grow container mx-auto px-4 py-8">
         {/* User's Earned Badges Section */}
