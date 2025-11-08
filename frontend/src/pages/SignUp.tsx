@@ -168,11 +168,11 @@ const SignUp: React.FC = () => {
           firstName: '',
           lastName: '',
           cpf: '',
-          email: errorMessage,
+          email: '',
           phone: '',
           birthday: '',
           password: '',
-          confirmPassword: ''
+          confirmPassword: errorMessage
         });
       } finally {
         setIsLoading(false);
