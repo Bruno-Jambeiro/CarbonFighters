@@ -29,7 +29,9 @@ WHERE
 
 CREATE TABLE IF NOT EXISTS activities (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
+    time TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     activity_type INTEGER NOT NULL,
+    activity_duration INTEGER NOT NULL, -- In minutes
     user_id INTEGER NOT NULL REFERENCES user(id),
     validated_by INTEGER REFERENCES user(id) DEFAULT NULL -- Initially null. When another user validates this activity it will be assigned to that user's id
 );

@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
-import jwt, { JsonWebTokenError } from 'jsonwebtoken';
+import { JsonWebTokenError } from 'jsonwebtoken';
+import { verifyToken } from '../services/token.service';
 
 interface JwtPayload {
     id: number;
@@ -14,7 +15,7 @@ export function authenticateToken(req: Request, res: Response, next: NextFunctio
         return
     }
     try {
-        const payload = jwt.verify(token, process.env.JWT_SECRET!) as JwtPayload;
+        const payload = verifyToken(token) as JwtPayload;
         req.user = { id: payload.id, email: payload.email };
         next();
     } catch (e) {
