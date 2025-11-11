@@ -1,7 +1,9 @@
 -- CarbonFighters Database Schema
 -- SQLite Database
 
--- Users table with complete profile information
+-- =========================
+-- Tabela de Usuários
+-- =========================
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     firstName TEXT NOT NULL,
@@ -14,11 +16,34 @@ CREATE TABLE IF NOT EXISTS users (
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
--- Follows table for user relationships (follower -> followed)
+-- =========================
+-- Tabela de Seguidores (Relacionamentos entre usuários)
+-- =========================
 CREATE TABLE IF NOT EXISTS follows (
     follower_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     followed_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
     PRIMARY KEY (follower_id, followed_id)
+);
+
+-- =========================
+-- Tabela de Grupos
+-- =========================
+CREATE TABLE IF NOT EXISTS groups (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    name TEXT NOT NULL,
+    owner_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    invite_code TEXT UNIQUE NOT NULL,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+-- =========================
+-- Tabela de Membros de Grupo (Relação N:N entre usuários e grupos)
+-- =========================
+CREATE TABLE IF NOT EXISTS group_members (
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
+    joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    PRIMARY KEY (user_id, group_id)
 );
 
 -- Friends view: mutual follows (when two users follow each other)
