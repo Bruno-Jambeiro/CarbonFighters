@@ -47,6 +47,7 @@ CREATE TABLE IF NOT EXISTS group_members (
 );
 
 -- Friends view: mutual follows (when two users follow each other)
+-- TODO: remove follower feature
 CREATE VIEW IF NOT EXISTS friends AS
 SELECT
     f1.follower_id AS user1_id,
