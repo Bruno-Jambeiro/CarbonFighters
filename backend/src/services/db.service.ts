@@ -84,35 +84,31 @@ async function initializeDatabase(db: Database<sqlite3.Database, sqlite3.Stateme
     console.log(`📊 Database schema initialized from SQL file: ${usedPath}`);
 }
 
-export async function query(sql: string, params?: any[]): Promise<any> {
+export async function dbRun(sql: string, params?: any[]): Promise<{ lastID?: number, changes?: number }> {
+    // Executes a query that does not return rows (INSERT, UPDATE, DELETE).
+    // Returns the result from the 'run' operation (e.g., lastID, changes).
+    
     const db = await getDb();
+    const result = params ? await db.run(sql, params) : await db.run(sql);
     
-    // Detect query type
-    const normalizedSql = sql.trim().toUpperCase();
-    
-    if (normalizedSql.startsWith('SELECT')) {
-        // SELECT query - return all rows
-        const rows = params ? await db.all(sql, params) : await db.all(sql);
-        return { rows };
-    } else if (normalizedSql.startsWith('INSERT')) {
-        // INSERT query - SQLite doesn't support RETURNING, so we need to query the inserted row
-        // Remove RETURNING clause if present
-        const cleanSql = sql.replace(/RETURNING \*/gi, '').trim().replace(/;$/, '');
-        const result = params ? await db.run(cleanSql, params) : await db.run(cleanSql);
-        
-        // Get the inserted row by ID
-        const insertedRow = await db.get('SELECT * FROM users WHERE id = ?', result.lastID);
-        
-        return { 
-            rows: insertedRow ? [insertedRow] : [],
-            rowCount: result.changes 
-        };
-    } else {
-        // UPDATE/DELETE - return affected rows count
-        const result = params ? await db.run(sql, params) : await db.run(sql);
-        return { 
-            rows: [],
-            rowCount: result.changes 
-        };
-    }
+    // The 'sqlite' wrapper returns an object with lastID and changes
+    return result;
+}
+
+export async function dbGet<T>(sql: string, params?: any[]): Promise<T | undefined> {
+    // Executes a query that returns a single row.
+    // Returns the row object or undefined.
+
+    const db = await getDb();
+    const row = params ? await db.get<T>(sql, params) : await db.get<T>(sql);
+    return row;
+}
+
+export async function dbAll<T>(sql: string, params?: any[]): Promise<T[]> {
+    // Executes a query that returns multiple rows.
+    // Returns an array of row objects.
+
+    const db = await getDb();
+    const rows = params ? await db.all<T[]>(sql, params) : await db.all<T[]>(sql);
+    return rows;
 }
