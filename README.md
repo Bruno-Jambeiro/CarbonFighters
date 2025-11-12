@@ -313,32 +313,32 @@ C4Component
 ```
 CarbonFighters/
 ├── backend/                    # REST API con Express + TypeScript
+│   ├── data/                   # SQL schema (create_tables.sql)
 │   ├── src/
 │   │   ├── controllers/        # Request handlers (auth.controller.ts)
-│   │   ├── services/           # Business logic (user, token, db services)
-│   │   ├── routes/             # Endpoint definitions (auth.routes.ts)
+│   │   ├── factories/          # Creation of Badges
 │   │   ├── models/             # TypeScript interfaces (user.model.ts)
+│   │   ├── routes/             # Endpoint definitions (auth.routes.ts)
+│   │   ├── services/           # Business logic (user, token, db services)
 │   │   ├── utils/              # Helper functions (validations.utils.ts)
 │   │   ├── app.ts              # Express app configuration
 │   │   └── server.ts           # Server entry point
 │   ├── tests/                  # Jest test suites
-│   ├── data/                   # SQL schema (create_tables.sql)
 │   ├── .env                    # Environment variables
 │   └── package.json
 │
 ├── frontend/                   # React SPA con Vite + TypeScript
+│   ├── public/                 # Public assets
 │   ├── src/
-│   │   ├── pages/              # Main views (Login, SignUp, Dashboard, Home, Profile)
-│   │   ├── components/         # Reusable components
-│   │   │   ├── forms/          # Form components (formInput, formSubmitButton)
-│   │   │   ├── headers/        # Header components (HeaderDash)
-│   │   │   └── footer/         # Footer components (FooterDash)
-│   │   ├── services/           # API client (api.ts)
-│   │   ├── modules/            # Feature modules (auth)
 │   │   ├── assets/             # Static resources
+│   │   ├── components/         # Reusable components
+│   │   │   ├── footer/         # Footer components (FooterDash)
+│   │   │   ├── forms/          # Form components (formInput, formSubmitButton)
+│   │   │   └── headers/        # Header components (HeaderDash)
+│   │   ├── pages/              # Main views (Login, SignUp, Dashboard, Home, Profile)
+│   │   ├── services/           # API client (api.ts)
 │   │   ├── App.tsx             # Root component with routing
 │   │   └── main.tsx            # Entry point
-│   ├── public/                 # Public assets
 │   └── package.json
 │
 ├── .github/                    # GitHub Actions workflows

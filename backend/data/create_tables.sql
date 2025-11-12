@@ -2,7 +2,7 @@
 -- SQLite Database
 
 -- =========================
--- Tabela de Usuários
+-- User Table
 -- =========================
 CREATE TABLE IF NOT EXISTS users (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -17,16 +17,7 @@ CREATE TABLE IF NOT EXISTS users (
 );
 
 -- =========================
--- Tabela de Seguidores (Relacionamentos entre usuários)
--- =========================
-CREATE TABLE IF NOT EXISTS follows (
-    follower_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    followed_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    PRIMARY KEY (follower_id, followed_id)
-);
-
--- =========================
--- Tabela de Grupos
+-- Groups Table
 -- =========================
 CREATE TABLE IF NOT EXISTS groups (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -37,7 +28,7 @@ CREATE TABLE IF NOT EXISTS groups (
 );
 
 -- =========================
--- Tabela de Membros de Grupo (Relação N:N entre usuários e grupos)
+-- Group Members Table (Many-to-Many relationship between users and groups)
 -- =========================
 CREATE TABLE IF NOT EXISTS group_members (
     user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
@@ -45,17 +36,3 @@ CREATE TABLE IF NOT EXISTS group_members (
     joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, group_id)
 );
-
--- Friends view: mutual follows (when two users follow each other)
--- TODO: remove follower feature
-CREATE VIEW IF NOT EXISTS friends AS
-SELECT
-    f1.follower_id AS user1_id,
-    f1.followed_id AS user2_id
-FROM
-    follows f1
-    JOIN follows f2
-        ON f1.follower_id = f2.followed_id
-        AND f1.followed_id = f2.follower_id
-WHERE
-    f1.follower_id < f1.followed_id;
