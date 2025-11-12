@@ -1,12 +1,6 @@
-import { Request, Response } from 'express';
+import { Response } from 'express';
 import { groupService } from '../services/group.service';
-
-// We need to extend the Express Request type to include 'user'
-// from our auth middleware. You should create a 'types.ts' file for this,
-// but for now, we can define it here.
-interface AuthRequest extends Request {
-    user?: { id: number }; // Define the shape of your 'user' object from the JWT
-}
+import { AuthRequest } from '../types/AuthRequest';
 
 class GroupController {
     

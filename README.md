@@ -317,10 +317,12 @@ CarbonFighters/
 │   ├── src/
 │   │   ├── controllers/        # Request handlers (auth.controller.ts)
 │   │   ├── factories/          # Creation of Badges
+│   │   ├── midlleware/         # Verifies Bearer JWT
 │   │   ├── models/             # TypeScript interfaces (user.model.ts)
 │   │   ├── routes/             # Endpoint definitions (auth.routes.ts)
 │   │   ├── services/           # Business logic (user, token, db services)
 │   │   ├── utils/              # Helper functions (validations.utils.ts)
+│   │   ├── types/              # Application-layer interfaces (AuthRequest, TokenPayload)
 │   │   ├── app.ts              # Express app configuration
 │   │   └── server.ts           # Server entry point
 │   ├── tests/                  # Jest test suites

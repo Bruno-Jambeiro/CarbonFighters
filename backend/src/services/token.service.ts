@@ -3,7 +3,7 @@ import { sign, verify, SignOptions } from 'jsonwebtoken';
 const JWT_SECRET = process.env.JWT_SECRET || 'default-secret';
 const JWT_EXPIRATION = (process.env.JWT_EXPIRATION || '1h') as SignOptions['expiresIn'];
 
-interface TokenPayload {
+export interface TokenPayload {
     id: number,
     email: string,
 }
