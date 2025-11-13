@@ -5,6 +5,7 @@ import Home from './pages/Home'
 import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import Badges from './pages/Badges'
+import Groups from './pages/Groups'
 
 function App() {
   return (
@@ -17,6 +18,7 @@ function App() {
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/profile" element={<Profile />} />
           <Route path="/badges" element={<Badges />} />
+          <Route path="/groups" element={<Groups />} />
         </Routes>
       </div>
     </Router>
