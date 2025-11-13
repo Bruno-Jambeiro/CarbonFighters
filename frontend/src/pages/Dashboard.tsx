@@ -9,7 +9,7 @@ export default function Dashboard() {
     const [user, setUser] = useState<any>(null);
 
     useEffect(() => {
-        const { token, user: userData } = getAuthData();
+        const { token, user: userData } = getAuthData();    
         
         if (!token || !userData) {
             navigate('/login');

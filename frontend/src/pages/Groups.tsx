@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 import { groupApi, getAuthData } from '../services/api';
 import type { Group } from '../services/api';
 import Navbar from '../components/Navbar';
@@ -241,11 +241,23 @@ function Groups() {
                           <h3 className="text-xl font-semibold text-green-700 mb-2">{group.name}</h3>
                           <div className="flex items-center gap-4 text-sm text-gray-600">
                             <div className="flex items-center">
-                              <svg className="h-4 w-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
-                              </svg>
-                              <span className="font-mono bg-gray-100 text-indigo-700 px-2 py-1 rounded">
-                                {group.invite_code}
+                              <button 
+                                onClick={() => {
+                                  // Toggle visibility logic would go here
+                                  const element = document.getElementById(`code-${group.id}`);
+                                  if (element) {
+                                    element.textContent = element.textContent === '••••••' ? group.invite_code : '••••••';
+                                  }
+                                }}
+                                className="flex items-center focus:outline-none"
+                              >
+                                <svg className="h-4 w-4 mr-1 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                                </svg>
+                              </button>
+                              <span id={`code-${group.id}`} className="font-mono bg-gray-100 text-indigo-700 px-2 py-1 rounded">
+                                ••••••
                               </span>
                             </div>
                             <div className="flex items-center">
