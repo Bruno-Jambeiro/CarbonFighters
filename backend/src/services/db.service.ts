@@ -87,10 +87,10 @@ async function initializeDatabase(db: Database<sqlite3.Database, sqlite3.Stateme
 export async function dbRun(sql: string, params?: any[]): Promise<{ lastID?: number, changes?: number }> {
     // Executes a query that does not return rows (INSERT, UPDATE, DELETE).
     // Returns the result from the 'run' operation (e.g., lastID, changes).
-
+    
     const db = await getDb();
     const result = params ? await db.run(sql, params) : await db.run(sql);
-
+    
     // The 'sqlite' wrapper returns an object with lastID and changes
     return result;
 }
