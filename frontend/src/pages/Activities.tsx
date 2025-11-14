@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuthData } from '../services/api';
+import { getAuthData, actionsApi } from '../services/api';
 import type { AuthResponse } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -8,14 +8,17 @@ import Footer from '../components/Footer';
 // Define action types
 interface Action {
   id: number;
-  title: string;
-  description: string;
-  actionType: string;
-  carbonSaved: number;
-  image: string //BASE64 image string;
-  validatedBy?: string;
-  createdAt: string;
+  activity_title: string;
+  activity_description: string;
+  activity_type: string;
+  activity_date: string;
+  image: string; //BASE64 image string
   validated: boolean;
+  // For display purposes, we'll compute these from the data
+  title?: string;
+  description?: string;
+  actionType?: string;
+  createdAt?: string;
 }
 
 const actionTypes = [
@@ -68,32 +71,8 @@ function Activities() {
       setIsLoading(true);
       setError(null);
       
-      // Mock data for demonstration
-      const mockActions: Action[] = [
-        {
-          id: 1,
-          title: "Bike to Work Week",
-          description: "Used my bike instead of car for the entire week",
-          actionType: "transport",
-          carbonSaved: 12.5,
-          createdAt: "2024-11-10",
-          validated: true,
-          validatedBy: "Community",
-          image: ""
-        },
-        {
-          id: 2,
-          title: "Solar Panel Installation",
-          description: "Installed solar panels on my rooftop",
-          actionType: "energy",
-          carbonSaved: 50.0,
-          createdAt: "2024-11-08",
-          validated: false,
-          image: ""
-        }
-      ];
-
-      setMyActions(mockActions);
+      const actions = await actionsApi.getMyActions();
+      setMyActions(actions);
     } catch (err) {
       setError((err as Error).message);
     } finally {
@@ -166,8 +145,21 @@ function Activities() {
       setFormError('Please enter a valid carbon saved amount.');
       return;
     }
+    if (!selectedFile) {
+      setFormError('Please upload an evidence photo of your action.');
+      return;
+    }
 
     try {
+        // Create action via API with file upload using FormData
+        await actionsApi.createAction(
+          selectedActionType,
+          actionTitle,
+          actionDescription,
+          new Date(),
+          selectedFile
+        );
+
         setFormSuccess(`Successfully posted action "${actionTitle}"!`);
 
         // Clear form
@@ -186,8 +178,8 @@ function Activities() {
           fileInputRef.current.value = '';
         }
 
-        // Refresh the list (in real app, this would refetch from API)
-        fetchActions();
+        // Refresh the list from the API
+        await fetchActions();
     } catch (err) {
       setFormError((err as Error).message);
     }
@@ -316,7 +308,7 @@ function Activities() {
                 {/* Image Upload */}
                 <div className="mb-6">
                   <label htmlFor="actionImage" className="block text-sm font-medium text-gray-700 mb-2">
-                    Evidence Photo (Optional)
+                    Evidence Photo <span className="text-red-500">*</span>
                   </label>
                   <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center hover:border-green-500 transition-colors">
                     <svg className="mx-auto h-12 w-12 text-gray-400" stroke="currentColor" fill="none" viewBox="0 0 48 48">
@@ -414,7 +406,7 @@ function Activities() {
               <div className="space-y-4">
                 {myActions.length > 0 ? (
                   myActions.map((action) => {
-                    const actionTypeInfo = getActionTypeInfo(action.actionType);
+                    const actionTypeInfo = getActionTypeInfo(action.activity_type);
                     return (
                       <div key={action.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
                         <div className="flex items-start justify-between mb-4">
@@ -433,17 +425,20 @@ function Activities() {
                                 </span>
                               )}
                             </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{action.title}</h3>
-                            <p className="text-gray-600 mb-3">{action.description}</p>
+                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{action.activity_title}</h3>
+                            <p className="text-gray-600 mb-3">{action.activity_description}</p>
                             <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span className="flex items-center gap-1">
-                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3" />
-                                </svg>
-                                {action.carbonSaved} kg CO₂ saved
-                              </span>
-                              <span>{new Date(action.createdAt).toLocaleDateString()}</span>
+                              <span>{new Date(action.activity_date).toLocaleDateString()}</span>
                             </div>
+                            {action.image && (
+                              <div className="mt-3">
+                                <img
+                                  src={`data:image/jpeg;base64,${action.image}`}
+                                  alt={action.activity_title}
+                                  className="w-full h-48 object-cover rounded-lg"
+                                />
+                              </div>
+                            )}
                           </div>
                         </div>
                       </div>
