@@ -6,19 +6,21 @@ import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import Badges from './pages/Badges'
 import Groups from './pages/Groups'
+import Activities from "./pages/Activities.tsx";
 
 function App() {
   return (
     <Router>
       <div className="App">
         <Routes>
-          <Route path="/" element={<Home />} />
-          <Route path="/login" element={<Login />} />
-          <Route path="/signup" element={<SignUp />} />
-          <Route path="/dashboard" element={<Dashboard />} />
-          <Route path="/profile" element={<Profile />} />
-          <Route path="/badges" element={<Badges />} />
-          <Route path="/groups" element={<Groups />} />
+            <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+            <Route path="/dashboard" element={<Dashboard />} />
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/badges" element={<Badges />} />
+            <Route path="/groups" element={<Groups />} />
+            <Route path="/activities" element={<Activities />} />
         </Routes>
       </div>
     </Router>
