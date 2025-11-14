@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { getAuthData } from '../services/api';
+import type { AuthResponse } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -11,10 +12,10 @@ interface Action {
   description: string;
   actionType: string;
   carbonSaved: number;
-  imageUrl?: string;
+  image: string //BASE64 image string;
+  validatedBy?: string;
   createdAt: string;
   validated: boolean;
-  validatedBy?: string;
 }
 
 const actionTypes = [
@@ -28,8 +29,8 @@ const actionTypes = [
 
 function Activities() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  
+  const [user, setUser] = useState<AuthResponse['user'] | null>(null);
+
   // State for the component
   const [myActions, setMyActions] = useState<Action[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -43,6 +44,8 @@ function Activities() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   // Check authentication and fetch user's actions
   useEffect(() => {
@@ -75,7 +78,8 @@ function Activities() {
           carbonSaved: 12.5,
           createdAt: "2024-11-10",
           validated: true,
-          validatedBy: "Community"
+          validatedBy: "Community",
+          image: ""
         },
         {
           id: 2,
@@ -84,10 +88,11 @@ function Activities() {
           actionType: "energy",
           carbonSaved: 50.0,
           createdAt: "2024-11-08",
-          validated: false
+          validated: false,
+          image: ""
         }
       ];
-      
+
       setMyActions(mockActions);
     } catch (err) {
       setError((err as Error).message);
@@ -95,6 +100,50 @@ function Activities() {
       setIsLoading(false);
     }
   };
+
+  /**
+   * Handles image file selection and preview creation.
+   */
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] || null;
+    setSelectedFile(file);
+
+    // Clean up previous preview URL to avoid memory leaks
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+    }
+
+    // Create new preview URL if file is selected
+    if (file) {
+      const previewUrl = URL.createObjectURL(file);
+      setImagePreview(previewUrl);
+    } else {
+      setImagePreview(null);
+    }
+  };
+
+  /**
+   * Clears the selected file and preview.
+   */
+  const clearSelectedFile = () => {
+    setSelectedFile(null);
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+      setImagePreview(null);
+    }
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
+  // Clean up preview URL on component unmount
+  useEffect(() => {
+    return () => {
+      if (imagePreview) {
+        URL.revokeObjectURL(imagePreview);
+      }
+    };
+  }, [imagePreview]);
 
   /**
    * Handles the submission of the "Post New Action" form.
@@ -119,19 +168,26 @@ function Activities() {
     }
 
     try {
-      // Here would be the API call to post the action
-      // For now, just simulate success
-      setFormSuccess(`Successfully posted action "${actionTitle}"!`);
-      
-      // Clear form
-      setActionTitle('');
-      setActionDescription('');
-      setCarbonSaved('');
-      setSelectedFile(null);
-      setSelectedActionType('transport');
-      
-      // Refresh the list (in real app, this would refetch from API)
-      fetchActions();
+        setFormSuccess(`Successfully posted action "${actionTitle}"!`);
+
+        // Clear form
+        setActionTitle('');
+        setActionDescription('');
+        setCarbonSaved('');
+        setSelectedFile(null);
+        setSelectedActionType('transport');
+
+        // Clear image preview
+        if (imagePreview) {
+          URL.revokeObjectURL(imagePreview);
+          setImagePreview(null);
+        }
+        if (fileInputRef.current) {
+          fileInputRef.current.value = '';
+        }
+
+        // Refresh the list (in real app, this would refetch from API)
+        fetchActions();
     } catch (err) {
       setFormError((err as Error).message);
     }
@@ -277,7 +333,8 @@ function Activities() {
                           type="file"
                           accept="image/*"
                           className="sr-only"
-                          onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
+                          onChange={handleFileChange}
+                          ref={fileInputRef}
                         />
                       </label>
                     </div>
@@ -286,9 +343,31 @@ function Activities() {
                     </p>
                   </div>
                   {selectedFile && (
-                    <p className="mt-2 text-sm text-green-600">
-                      Selected: {selectedFile.name}
-                    </p>
+                    <div className="mt-3 flex items-center justify-between">
+                      <p className="text-sm text-green-600 truncate">
+                        Selected: {selectedFile.name}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={clearSelectedFile}
+                        className="text-sm text-red-600 hover:text-red-700 font-medium"
+                        aria-label="Remove selected image"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+                  {imagePreview && (
+                    <div className="mt-4">
+                      <div className="relative w-full max-h-64 overflow-hidden rounded-lg border border-gray-200">
+                        <img
+                          src={imagePreview}
+                          alt="Preview of uploaded action evidence"
+                          className="w-full h-full object-contain bg-gray-50"
+                          loading="lazy"
+                        />
+                      </div>
+                    </div>
                   )}
                 </div>
 
@@ -379,107 +458,6 @@ function Activities() {
                 )}
               </div>
             )}
-          </div>
-        </div>
-
-        {/* Community Activities Feed */}
-        <div className="bg-white rounded-xl shadow-lg p-8 mt-8">
-          <div className="flex items-center justify-between mb-6">
-            <h2 className="text-2xl font-bold text-gray-900">Community Actions Feed</h2>
-            <button className="text-blue-600 hover:text-blue-800 font-medium">
-              View All
-            </button>
-          </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Sample community actions */}
-            <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-blue-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  JD
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-gray-900">John Doe</p>
-                  <p className="text-xs text-gray-500">2 hours ago</p>
-                </div>
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Composting Setup</h4>
-              <p className="text-sm text-gray-600 mb-3">Started composting organic waste at home</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs bg-green-100 text-green-800 px-2 py-1 rounded-full">
-                  ♻️ Waste Reduction
-                </span>
-                <span className="text-xs text-gray-500">3.2 kg CO₂ saved</span>
-              </div>
-            </div>
-
-            <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-purple-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  MJ
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-gray-900">Maria Johnson</p>
-                  <p className="text-xs text-gray-500">5 hours ago</p>
-                </div>
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">Plant-Based Week</h4>
-              <p className="text-sm text-gray-600 mb-3">Completed a week of plant-based meals</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs bg-purple-100 text-purple-800 px-2 py-1 rounded-full">
-                  🌱 Sustainable Food
-                </span>
-                <span className="text-xs text-gray-500">8.5 kg CO₂ saved</span>
-              </div>
-            </div>
-
-            <div className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow">
-              <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-green-500 rounded-full flex items-center justify-center text-white text-sm font-bold">
-                  AS
-                </div>
-                <div>
-                  <p className="font-semibold text-sm text-gray-900">Alex Smith</p>
-                  <p className="text-xs text-gray-500">1 day ago</p>
-                </div>
-              </div>
-              <h4 className="font-semibold text-gray-900 mb-2">LED Upgrade</h4>
-              <p className="text-sm text-gray-600 mb-3">Replaced all bulbs with LED lights</p>
-              <div className="flex items-center justify-between">
-                <span className="text-xs bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full">
-                  ⚡ Energy Conservation
-                </span>
-                <span className="text-xs text-gray-500">15.0 kg CO₂ saved</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Challenge Section */}
-        <div className="bg-gradient-to-br from-orange-400 to-pink-500 rounded-xl shadow-lg p-8 mt-8 text-white">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-2xl font-bold mb-2">Monthly Challenge</h2>
-              <p className="text-orange-100 mb-4">November 2024: "No Car November"</p>
-              <p className="text-sm text-orange-100 mb-4">
-                Use alternative transportation methods for the entire month!
-              </p>
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-3xl font-bold">847</p>
-                  <p className="text-sm text-orange-100">Participants</p>
-                </div>
-                <div>
-                  <p className="text-3xl font-bold">2.1T</p>
-                  <p className="text-sm text-orange-100">CO₂ Saved</p>
-                </div>
-              </div>
-            </div>
-            <div className="bg-white bg-opacity-20 rounded-full p-4">
-              <svg className="h-16 w-16" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
           </div>
         </div>
       </div>
