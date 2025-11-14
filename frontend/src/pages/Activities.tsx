@@ -26,7 +26,7 @@ const actionTypes = [
   { value: 'other', label: '🌍 Other Eco-Action', color: 'from-gray-500 to-gray-600' },
 ];
 
-function Actions() {
+function Activities() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
   
@@ -305,7 +305,7 @@ function Actions() {
             </div>
           </div>
 
-          {/* --- My Actions List --- */}
+          {/* --- My Activities List --- */}
           <div className="bg-white rounded-xl shadow-lg p-8">
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-bold text-gray-900">My Actions</h2>
@@ -382,7 +382,7 @@ function Actions() {
           </div>
         </div>
 
-        {/* Community Actions Feed */}
+        {/* Community Activities Feed */}
         <div className="bg-white rounded-xl shadow-lg p-8 mt-8">
           <div className="flex items-center justify-between mb-6">
             <h2 className="text-2xl font-bold text-gray-900">Community Actions Feed</h2>
@@ -489,4 +489,4 @@ function Actions() {
   );
 }
 
-export default Actions;
+export default Activities;
