@@ -12,7 +12,10 @@
  * - Simplifies testing and maintenance
  */
 
-import { Badge, BadgeType } from '../models/badge.model';
+import { Badge, BadgeType, RequirementType } from '../models/badge.model';
+
+// Type for badge creation (without DB-generated fields)
+export type BadgeInput = Omit<Badge, 'id' | 'created_at'>;
 
 export class BadgeFactory {
     /**
@@ -20,10 +23,10 @@ export class BadgeFactory {
      * 
      * @param type - The type of badge to create (STREAK, MILESTONE, SPECIAL, CATEGORY)
      * @param requirement - The numeric requirement (days, actions count, event id, etc.)
-     * @returns A fully configured Badge object
+     * @returns A fully configured Badge object (without id and created_at)
      * @throws Error if badge type is unknown
      */
-    static createBadge(type: BadgeType, requirement: number): Badge {
+    static createBadge(type: BadgeType, requirement: number): BadgeInput {
         if (requirement < 0) {
             throw new Error('Badge requirement must be a positive number');
         }
@@ -52,7 +55,7 @@ export class BadgeFactory {
      * @param days - Number of consecutive days
      * @returns Badge configured for streak achievement
      */
-    private static createStreakBadge(days: number): Badge {
+    private static createStreakBadge(days: number): BadgeInput {
         const streakNames: { [key: number]: string } = {
             7: '7 Dias de Fogo',
             30: 'Mestre da Consistência',
@@ -67,6 +70,7 @@ export class BadgeFactory {
             type: BadgeType.STREAK,
             icon: '🔥',
             requirement: days,
+            requirement_type: RequirementType.STREAK_DAYS,
             points: days * 10
         };
     }
@@ -77,7 +81,7 @@ export class BadgeFactory {
      * @param count - Total number of sustainable actions
      * @returns Badge configured for milestone achievement
      */
-    private static createMilestoneBadge(count: number): Badge {
+    private static createMilestoneBadge(count: number): BadgeInput {
         const milestones: { [key: number]: { name: string; icon: string } } = {
             10: { name: 'Primeiro Passo', icon: '👣' },
             50: { name: 'Em Progresso', icon: '🌿' },
@@ -98,6 +102,7 @@ export class BadgeFactory {
             type: BadgeType.MILESTONE,
             icon: milestone.icon,
             requirement: count,
+            requirement_type: RequirementType.ACTIONS_COUNT,
             points: count
         };
     }
@@ -108,7 +113,7 @@ export class BadgeFactory {
      * @param eventId - Identifier for the special event
      * @returns Badge configured for special event
      */
-    private static createSpecialBadge(eventId: number): Badge {
+    private static createSpecialBadge(eventId: number): BadgeInput {
         const specialEvents: { [key: number]: { name: string; description: string; points: number } } = {
             1: { 
                 name: 'Dia da Terra 2025', 
@@ -139,6 +144,7 @@ export class BadgeFactory {
             type: BadgeType.SPECIAL,
             icon: '⭐',
             requirement: eventId,
+            requirement_type: RequirementType.SPECIAL_EVENT,
             points: event.points
         };
     }
@@ -149,34 +155,39 @@ export class BadgeFactory {
      * @param categoryId - Identifier for the action category
      * @returns Badge configured for category specialization
      */
-    private static createCategoryBadge(categoryId: number): Badge {
-        const categories: { [key: number]: { name: string; description: string; icon: string } } = {
+    private static createCategoryBadge(categoryId: number): BadgeInput {
+        const categories: { [key: number]: { name: string; description: string; icon: string; category: string } } = {
             1: { 
                 name: 'Mestre do Transporte Verde', 
                 description: 'Completou 50 ações de transporte sustentável',
-                icon: '🚲' 
+                icon: '🚲',
+                category: 'transport'
             },
             2: { 
                 name: 'Rei da Reciclagem', 
                 description: 'Completou 50 ações de reciclagem',
-                icon: '♻️' 
+                icon: '♻️',
+                category: 'recycling'
             },
             3: { 
                 name: 'Guardião da Água', 
                 description: 'Completou 50 ações de economia de água',
-                icon: '💧' 
+                icon: '💧',
+                category: 'water'
             },
             4: { 
                 name: 'Guerreiro da Energia', 
                 description: 'Completou 50 ações de economia de energia',
-                icon: '⚡' 
+                icon: '⚡',
+                category: 'energy'
             }
         };
 
         const category = categories[categoryId] || {
             name: `Especialista Categoria #${categoryId}`,
             description: 'Especialista em uma categoria de ações sustentáveis',
-            icon: '🎖️'
+            icon: '🎖️',
+            category: 'other'
         };
 
         return {
@@ -185,6 +196,8 @@ export class BadgeFactory {
             type: BadgeType.CATEGORY,
             icon: category.icon,
             requirement: 50,
+            requirement_type: RequirementType.CATEGORY_COUNT,
+            category: category.category,
             points: 300
         };
     }
@@ -201,7 +214,7 @@ export class BadgeFactory {
      * Helper method to get example badges for each type
      * Useful for documentation and demo purposes
      */
-    static getExampleBadges(): Badge[] {
+    static getExampleBadges(): BadgeInput[] {
         return [
             this.createBadge(BadgeType.STREAK, 7),
             this.createBadge(BadgeType.STREAK, 30),
