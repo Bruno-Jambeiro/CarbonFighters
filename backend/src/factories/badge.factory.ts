@@ -17,6 +17,21 @@ import { Badge, BadgeType, RequirementType } from '../models/badge.model';
 // Type for badge creation (without DB-generated fields)
 export type BadgeInput = Omit<Badge, 'id' | 'created_at'>;
 
+/**
+ * Configuration interface for badge creation
+ * Encapsulates all badge properties to reduce code duplication (Data Clumps refactoring)
+ */
+interface BadgeConfig {
+    name: string;
+    description: string;
+    type: BadgeType;
+    icon: string;
+    requirement: number;
+    requirement_type: RequirementType;
+    points: number;
+    category?: string; // Optional, only for CATEGORY badges
+}
+
 export class BadgeFactory {
     /**
      * Factory Method - Creates a badge based on type and requirement
@@ -64,7 +79,7 @@ export class BadgeFactory {
 
         const name = streakNames[days] || `Racha de ${days} Dias`;
 
-        return {
+        const config: BadgeConfig = {
             name,
             description: `Completou ${days} dias consecutivos de ações sustentáveis`,
             type: BadgeType.STREAK,
@@ -73,6 +88,8 @@ export class BadgeFactory {
             requirement_type: RequirementType.STREAK_DAYS,
             points: days * 10
         };
+
+        return this.buildBadge(config);
     }
 
     /**
@@ -96,7 +113,7 @@ export class BadgeFactory {
             icon: '🏆' 
         };
 
-        return {
+        const config: BadgeConfig = {
             name: milestone.name,
             description: `Completou ${count} ações sustentáveis`,
             type: BadgeType.MILESTONE,
@@ -105,6 +122,8 @@ export class BadgeFactory {
             requirement_type: RequirementType.ACTIONS_COUNT,
             points: count
         };
+
+        return this.buildBadge(config);
     }
 
     /**
@@ -138,7 +157,7 @@ export class BadgeFactory {
             points: 500
         };
 
-        return {
+        const config: BadgeConfig = {
             name: event.name,
             description: event.description,
             type: BadgeType.SPECIAL,
@@ -147,6 +166,8 @@ export class BadgeFactory {
             requirement_type: RequirementType.SPECIAL_EVENT,
             points: event.points
         };
+
+        return this.buildBadge(config);
     }
 
     /**
@@ -190,7 +211,7 @@ export class BadgeFactory {
             category: 'other'
         };
 
-        return {
+        const config: BadgeConfig = {
             name: category.name,
             description: category.description,
             type: BadgeType.CATEGORY,
@@ -200,6 +221,35 @@ export class BadgeFactory {
             category: category.category,
             points: 300
         };
+
+        return this.buildBadge(config);
+    }
+
+    /**
+     * Helper method to build a badge from configuration
+     * Centralizes badge object creation and reduces code duplication
+     * Implements the Introduce Parameter Object refactoring pattern
+     * 
+     * @param config - Badge configuration object
+     * @returns Complete BadgeInput object ready for database insertion
+     */
+    private static buildBadge(config: BadgeConfig): BadgeInput {
+        const badge: BadgeInput = {
+            name: config.name,
+            description: config.description,
+            type: config.type,
+            icon: config.icon,
+            requirement: config.requirement,
+            requirement_type: config.requirement_type,
+            points: config.points
+        };
+
+        // Only add category if it exists (for CATEGORY type badges)
+        if (config.category) {
+            badge.category = config.category;
+        }
+
+        return badge;
     }
 
     /**
