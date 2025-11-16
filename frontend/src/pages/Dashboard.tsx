@@ -1,12 +1,21 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
-import { getAuthData } from '../services/api';
+import { getAuthData, actionApi, type ActionStats, type SustainableAction, type ActionType, type LogActionData } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
 export default function Dashboard() {
     const navigate = useNavigate();
     const [user, setUser] = useState<any>(null);
+    const [stats, setStats] = useState<ActionStats>({
+        total_actions: 0,
+        total_carbon_saved: 0,
+        total_points: 0,
+        current_streak: 0
+    });
+    const [recentActions, setRecentActions] = useState<SustainableAction[]>([]);
+    const [showLogModal, setShowLogModal] = useState(false);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         const { token, user: userData } = getAuthData();    
@@ -17,9 +26,73 @@ export default function Dashboard() {
         }
         
         setUser(userData);
+        loadUserData();
     }, [navigate]);
 
-    if (!user) {
+    const loadUserData = async () => {
+        try {
+            setLoading(true);
+            // Cargar estadísticas (AC2: mostrar racha visualmente)
+            const statsData = await actionApi.getMyStats();
+            setStats(statsData);
+
+            // Cargar acciones recientes
+            const { actions } = await actionApi.getMyActions();
+            setRecentActions(actions.slice(0, 5)); // Últimas 5 acciones
+        } catch (error) {
+            console.error('Error loading user data:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    // Handler para registrar una acción
+    const handleLogAction = async (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const formData = new FormData(e.currentTarget);
+        
+        const actionData: LogActionData = {
+            action_type: formData.get('action_type') as ActionType,
+            description: formData.get('description') as string,
+            carbon_saved: parseFloat(formData.get('carbon_saved') as string) || 0,
+            points: parseInt(formData.get('points') as string) || 10,
+        };
+
+        try {
+            await actionApi.logAction(actionData);
+            setShowLogModal(false);
+            // Recargar datos
+            await loadUserData();
+            // Resetear formulario
+            e.currentTarget.reset();
+        } catch (error) {
+            console.error('Error logging action:', error);
+            alert('Error al registrar la acción. Por favor intenta de nuevo.');
+        }
+    };
+
+    const getActionTypeIcon = (type: string) => {
+        const icons: Record<string, string> = {
+            transport: '🚲',
+            recycling: '♻️',
+            water: '💧',
+            energy: '⚡',
+            food: '🍎',
+            other: '🌱'
+        };
+        return icons[type] || '🌱';
+    };
+
+    const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString('es-ES', { 
+            day: 'numeric', 
+            month: 'short',
+            year: 'numeric'
+        });
+    };
+
+    if (!user || loading) {
         return (
             <div className="w-screen h-screen flex items-center justify-center">
                 <div className="text-xl text-gray-600">Loading...</div>
@@ -39,12 +112,27 @@ export default function Dashboard() {
                     <p className="text-gray-600 mt-2">Track your carbon footprint and make a difference today.</p>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+                {/* AC2: Mostrar racha visualmente */}
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
+                    {/* NUEVO: Card de Racha */}
+                    <div className="bg-gradient-to-br from-orange-400 to-red-600 rounded-xl shadow-lg p-6 text-white">
+                        <div className="flex items-center justify-between">
+                            <div>
+                                <p className="text-orange-100 text-sm font-medium">🔥 Current Streak</p>
+                                <p className="text-5xl font-bold mt-2">{stats.current_streak}</p>
+                                <p className="text-orange-100 text-xs mt-1">consecutive days</p>
+                            </div>
+                            <div className="bg-white bg-opacity-20 rounded-full p-3">
+                                <span className="text-5xl">🔥</span>
+                            </div>
+                        </div>
+                    </div>
+
                     <div className="bg-gradient-to-br from-green-400 to-green-600 rounded-xl shadow-lg p-6 text-white">
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-green-100 text-sm font-medium">Carbon Saved</p>
-                                <p className="text-3xl font-bold mt-2">0 kg</p>
+                                <p className="text-3xl font-bold mt-2">{stats.total_carbon_saved.toFixed(1)} kg</p>
                             </div>
                             <div className="bg-white bg-opacity-20 rounded-full p-3">
                                 <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -58,7 +146,7 @@ export default function Dashboard() {
                         <div className="flex items-center justify-between">
                             <div>
                                 <p className="text-blue-100 text-sm font-medium">Activities</p>
-                                <p className="text-3xl font-bold mt-2">0</p>
+                                <p className="text-3xl font-bold mt-2">{stats.total_actions}</p>
                             </div>
                             <div className="bg-white bg-opacity-20 rounded-full p-3">
                                 <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -71,8 +159,8 @@ export default function Dashboard() {
                     <div className="bg-gradient-to-br from-purple-400 to-purple-600 rounded-xl shadow-lg p-6 text-white">
                         <div className="flex items-center justify-between">
                             <div>
-                                <p className="text-purple-100 text-sm font-medium">Impact Score</p>
-                                <p className="text-3xl font-bold mt-2">0</p>
+                                <p className="text-purple-100 text-sm font-medium">Total Points</p>
+                                <p className="text-3xl font-bold mt-2">{stats.total_points}</p>
                             </div>
                             <div className="bg-white bg-opacity-20 rounded-full p-3">
                                 <svg className="h-8 w-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -192,7 +280,10 @@ export default function Dashboard() {
                 <div className="bg-white rounded-xl shadow-lg p-8">
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Quick Actions</h2>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <button className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg">
+                        <button 
+                            onClick={() => setShowLogModal(true)}
+                            className="bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white font-semibold py-4 px-6 rounded-lg transition-all shadow-md hover:shadow-lg"
+                        >
                             <svg className="h-6 w-6 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4v16m8-8H4" />
                             </svg>
@@ -229,18 +320,43 @@ export default function Dashboard() {
                     <div className="bg-white rounded-xl shadow-lg p-8">
                         <h2 className="text-2xl font-bold text-gray-900 mb-6">Recent Activities</h2>
                         <div className="space-y-4">
-                            <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg">
-                                <div className="bg-green-500 rounded-full p-2">
-                                    <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
-                                    </svg>
+                            {recentActions.length === 0 ? (
+                                <div className="flex items-start gap-4 p-4 bg-green-50 rounded-lg">
+                                    <div className="bg-green-500 rounded-full p-2">
+                                        <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7" />
+                                        </svg>
+                                    </div>
+                                    <div className="flex-1">
+                                        <h3 className="font-semibold text-gray-900">No activities yet</h3>
+                                        <p className="text-sm text-gray-600 mt-1">Start logging your eco-friendly actions!</p>
+                                        <p className="text-xs text-gray-500 mt-2">Get started by clicking "Log Activity" above</p>
+                                    </div>
                                 </div>
-                                <div className="flex-1">
-                                    <h3 className="font-semibold text-gray-900">No activities yet</h3>
-                                    <p className="text-sm text-gray-600 mt-1">Start logging your eco-friendly actions!</p>
-                                    <p className="text-xs text-gray-500 mt-2">Get started by clicking "Log Activity" above</p>
-                                </div>
-                            </div>
+                            ) : (
+                                recentActions.map((action) => (
+                                    <div key={action.id} className="flex items-start gap-4 p-4 bg-green-50 rounded-lg border-l-4 border-green-500">
+                                        <div className="text-3xl">{getActionTypeIcon(action.action_type)}</div>
+                                        <div className="flex-1">
+                                            <div className="flex justify-between items-start">
+                                                <h3 className="font-semibold text-gray-900 capitalize">{action.action_type}</h3>
+                                                <span className="text-xs text-gray-500">{formatDate(action.action_date)}</span>
+                                            </div>
+                                            <p className="text-sm text-gray-600 mt-1">{action.description}</p>
+                                            <div className="flex gap-3 mt-2 text-xs">
+                                                {action.carbon_saved > 0 && (
+                                                    <span className="text-green-600 font-medium">
+                                                        💨 {action.carbon_saved.toFixed(1)}kg CO₂
+                                                    </span>
+                                                )}
+                                                <span className="text-purple-600 font-medium">
+                                                    ⭐ {action.points} pts
+                                                </span>
+                                            </div>
+                                        </div>
+                                    </div>
+                                ))
+                            )}
                         </div>
                     </div>
 
@@ -298,6 +414,102 @@ export default function Dashboard() {
                         </div>
                     </div>
                 </div>
+
+                {/* Modal for logging sustainable action */}
+                {showLogModal && (
+                    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
+                        <div className="bg-white rounded-2xl shadow-2xl max-w-md w-full p-8">
+                            <div className="flex justify-between items-center mb-6">
+                                <h2 className="text-2xl font-bold text-gray-900">Log Sustainable Action</h2>
+                                <button
+                                    onClick={() => setShowLogModal(false)}
+                                    className="text-gray-400 hover:text-gray-600"
+                                >
+                                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                                    </svg>
+                                </button>
+                            </div>
+
+                            <form onSubmit={handleLogAction} className="space-y-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Action Type
+                                    </label>
+                                    <select
+                                        name="action_type"
+                                        required
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    >
+                                        <option value="transport">🚲 Transport</option>
+                                        <option value="recycling">♻️ Recycling</option>
+                                        <option value="water">💧 Water Conservation</option>
+                                        <option value="energy">⚡ Energy Saving</option>
+                                        <option value="food">🍎 Sustainable Food</option>
+                                        <option value="other">🌱 Other</option>
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                                        Description
+                                    </label>
+                                    <textarea
+                                        name="description"
+                                        required
+                                        rows={3}
+                                        placeholder="Describe what you did..."
+                                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                    />
+                                </div>
+
+                                <div className="grid grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            CO₂ Saved (kg)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="carbon_saved"
+                                            step="0.1"
+                                            min="0"
+                                            defaultValue="0"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-medium text-gray-700 mb-2">
+                                            Points
+                                        </label>
+                                        <input
+                                            type="number"
+                                            name="points"
+                                            min="1"
+                                            defaultValue="10"
+                                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                                        />
+                                    </div>
+                                </div>
+
+                                <div className="flex gap-3 mt-6">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowLogModal(false)}
+                                        className="flex-1 px-6 py-3 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 font-medium"
+                                    >
+                                        Cancel
+                                    </button>
+                                    <button
+                                        type="submit"
+                                        className="flex-1 px-6 py-3 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 font-medium shadow-md hover:shadow-lg"
+                                    >
+                                        Log Action
+                                    </button>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                )}
             </div>
 
             <Footer />

@@ -156,6 +156,34 @@ export interface GroupMember {
   joined_at: string;
 }
 
+// Actions interfaces
+export interface SustainableAction {
+  id: number;
+  user_id: number;
+  action_type: ActionType;
+  description: string;
+  carbon_saved: number;
+  points: number;
+  action_date: string;
+  created_at: string;
+}
+
+export type ActionType = 'transport' | 'recycling' | 'water' | 'energy' | 'food' | 'other';
+
+export interface ActionStats {
+  total_actions: number;
+  total_carbon_saved: number;
+  total_points: number;
+  current_streak: number;
+}
+
+export interface LogActionData {
+  action_type: ActionType;
+  description: string;
+  carbon_saved?: number;
+  points?: number;
+}
+
 // --- NEW GROUP API ---
 
 export const groupApi = {
@@ -181,5 +209,37 @@ export const groupApi = {
    */
   joinGroup: (inviteCode: string): Promise<{ message: string, membership: GroupMember }> => {
     return apiClient('/groups/join', 'POST', { inviteCode });
+  },
+};
+
+// --- ACTIONS API ---
+
+export const actionApi = {
+  /**
+   * Logs a new sustainable action
+   * Corresponds to: POST /actions
+   */
+  logAction: (data: LogActionData): Promise<{ 
+    message: string; 
+    action: SustainableAction; 
+    stats: ActionStats 
+  }> => {
+    return apiClient('/actions', 'POST', data);
+  },
+
+  /**
+   * Gets all actions for the current user
+   * Corresponds to: GET /actions
+   */
+  getMyActions: (): Promise<{ actions: SustainableAction[]; count: number }> => {
+    return apiClient('/actions', 'GET');
+  },
+
+  /**
+   * Gets stats for the current user (including current streak)
+   * Corresponds to: GET /actions/stats
+   */
+  getMyStats: (): Promise<ActionStats> => {
+    return apiClient('/actions/stats', 'GET');
   },
 };

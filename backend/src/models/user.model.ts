@@ -7,5 +7,7 @@ export interface User {
     phone?: string;
     birthday?: string;
     password: string;
+    current_streak?: number;
+    last_action_date?: string;
     created_at: string;
 }
