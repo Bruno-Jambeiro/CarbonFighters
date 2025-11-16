@@ -2,6 +2,7 @@ import express from 'express';
 import authRoutes from './routes/auth.routes';
 import groupRouthes from './routes/group.routes';
 import actionRoutes from './routes/action.routes';
+import badgeRoutes from './routes/badge.routes';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
@@ -23,5 +24,6 @@ app.use(express.json());
 app.use('/auth', authRoutes);
 app.use('/groups', groupRouthes);
 app.use('/actions', actionRoutes);
+app.use('/badges', badgeRoutes);
 
 export default app;

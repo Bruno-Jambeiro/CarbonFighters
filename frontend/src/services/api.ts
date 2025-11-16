@@ -184,6 +184,36 @@ export interface LogActionData {
   points?: number;
 }
 
+// Badge interfaces
+export interface Badge {
+  id: number;
+  name: string;
+  description: string;
+  type: BadgeType;
+  icon: string;
+  requirement: number;
+  requirement_type: string;
+  category?: string;
+  points: number;
+  created_at: string;
+  earned_at?: string;
+}
+
+export type BadgeType = 'streak' | 'milestone' | 'special' | 'category';
+
+export interface Notification {
+  id: number;
+  user_id: number;
+  type: string;
+  title: string;
+  message: string;
+  badge_id?: number;
+  is_read: boolean;
+  created_at: string;
+  icon?: string;
+  badge_name?: string;
+}
+
 // --- NEW GROUP API ---
 
 export const groupApi = {
@@ -241,5 +271,53 @@ export const actionApi = {
    */
   getMyStats: (): Promise<ActionStats> => {
     return apiClient('/actions/stats', 'GET');
+  },
+};
+
+// --- BADGES API ---
+
+export const badgeApi = {
+  /**
+   * Gets all available badges
+   * Corresponds to: GET /badges
+   */
+  getAllBadges: (): Promise<{ badges: Badge[] }> => {
+    return apiClient('/badges', 'GET');
+  },
+
+  /**
+   * Gets badges earned by the current user
+   * Corresponds to: GET /badges/my-badges
+   */
+  getMyBadges: (): Promise<{ badges: Badge[]; count: number }> => {
+    return apiClient('/badges/my-badges', 'GET');
+  },
+
+  /**
+   * Gets notifications for the current user
+   * Corresponds to: GET /badges/notifications
+   */
+  getMyNotifications: (unreadOnly: boolean = false): Promise<{ 
+    notifications: Notification[]; 
+    unreadCount: number 
+  }> => {
+    const query = unreadOnly ? '?unread=true' : '';
+    return apiClient(`/badges/notifications${query}`, 'GET');
+  },
+
+  /**
+   * Marks a notification as read
+   * Corresponds to: PUT /badges/notifications/:id/read
+   */
+  markNotificationAsRead: (notificationId: number): Promise<{ message: string }> => {
+    return apiClient(`/badges/notifications/${notificationId}/read`, 'PUT');
+  },
+
+  /**
+   * Marks all notifications as read
+   * Corresponds to: PUT /badges/notifications/read-all
+   */
+  markAllNotificationsAsRead: (): Promise<{ message: string }> => {
+    return apiClient('/badges/notifications/read-all', 'PUT');
   },
 };

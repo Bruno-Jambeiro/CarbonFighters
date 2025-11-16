@@ -1,9 +1,10 @@
 import { SustainableAction, ActionStats } from '../models/action.model';
 import { dbAll, dbGet, dbRun } from './db.service';
+import * as badgeService from './badge.service';
 
 /**
  * Creates a new sustainable action and updates the user's streak
- * AC3: The streak count must increment by one when the user logs their first action of a new calendar day.
+ * 4.1 AC3: The streak count must increment by one when the user logs their first action of a new calendar day.
  */
 export async function createAction(
     userId: number,
@@ -28,6 +29,9 @@ export async function createAction(
     // Update the user's streak
     await updateUserStreak(userId, date);
 
+    // Check and award badges automatically
+    await badgeService.checkAndAwardBadges(userId);
+
     // Get the created action
     const action = await dbGet<SustainableAction>(
         'SELECT * FROM sustainable_actions WHERE id = ?',
@@ -39,9 +43,9 @@ export async function createAction(
 
 /**
  * Actually updates the user's streak based on the action date.
- * AC1: The system must track the number of consecutive days that a user logs at least one sustainable action.
- * AC3: The streak count must increment by one when the user logs their first action of a new calendar day.
- * AC4: If a user does not log any action for an entire calendar day, the streak must reset to zero.
+ * 4.1 AC1: The system must track the number of consecutive days that a user logs at least one sustainable action.
+ * 4.1 AC3: The streak count must increment by one when the user logs their first action of a new calendar day.
+ * 4.1 AC4: If a user does not log any action for an entire calendar day, the streak must reset to zero.
  */
 async function updateUserStreak(userId: number, actionDate: string): Promise<void> {
     // Get the user's last action date and current streak

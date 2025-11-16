@@ -1,6 +1,7 @@
 import { dbRun, dbGet, dbAll } from './db.service';
 import { nanoid } from 'nanoid';
 import { Group, GroupMember } from '../models/group.model';
+import * as badgeService from './badge.service';
 
 class GroupService {
     // Handles business logic for Groups.
@@ -87,6 +88,9 @@ class GroupService {
         if (!newMember) {
             throw new Error('Failed to join group.');
         }
+
+        // CA2: Verificar y otorgar badges automáticamente
+        await badgeService.checkAndAwardBadges(userId);
 
         return newMember;
     }

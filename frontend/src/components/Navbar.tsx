@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { clearAuthData } from '../services/api';
 import carbonFightersLogo from '../assets/carbonfighters.png';
+import NotificationPanel from './NotificationPanel';
 
 interface NavbarProps {
     user: {
@@ -67,6 +68,9 @@ export default function Navbar({ user }: NavbarProps) {
                         >
                             Activities
                         </Link>
+
+                        {/*Notification Panel */}
+                        <NotificationPanel />
 
                         {/* User Dropdown */}
                         <div className="relative">
