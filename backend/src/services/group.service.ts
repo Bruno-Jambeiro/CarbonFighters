@@ -7,9 +7,44 @@ class GroupService {
     // Handles business logic for Groups.
     // Abstracts database interactions.
     
+    /**
+     * Validates group creation input
+     * Throws descriptive errors if validation fails
+     * @param name - Group name to validate
+     * @param ownerId - User ID to validate
+     * @throws Error if validation fails
+     */
+    private validateGroupCreation(name: string | undefined, ownerId: number | undefined): void {
+        if (!name || name.trim().length === 0) {
+            throw new Error('Group name is required.');
+        }
+        if (!ownerId) {
+            throw new Error('User not authenticated.');
+        }
+    }
+
+    /**
+     * Validates group join input
+     * Throws descriptive errors if validation fails
+     * @param inviteCode - Invite code to validate
+     * @param userId - User ID to validate
+     * @throws Error if validation fails
+     */
+    private validateGroupJoin(inviteCode: string | undefined, userId: number | undefined): void {
+        if (!inviteCode || inviteCode.trim().length === 0) {
+            throw new Error('Invite code is required.');
+        }
+        if (!userId) {
+            throw new Error('User not authenticated.');
+        }
+    }
+    
     public async createGroup(name: string, ownerId: number): Promise<Group> {
         // Creates a new group and automatically adds the creator as the first member.
         // This is executed as a transaction to ensure data integrity.
+
+        // Validate inputs (business logic moved from controller)
+        this.validateGroupCreation(name, ownerId);
 
         const inviteCode = nanoid(8); // Generate an 8-character random invite code
         
@@ -56,6 +91,9 @@ class GroupService {
     
     public async joinGroup(inviteCode: string, userId: number): Promise<GroupMember> {
         // Adds a user to a group using an invite code.
+
+        // Validate inputs (business logic moved from controller)
+        this.validateGroupJoin(inviteCode, userId);
 
         // Find the group by the invite code
         const group = await this.findGroupByInviteCode(inviteCode);

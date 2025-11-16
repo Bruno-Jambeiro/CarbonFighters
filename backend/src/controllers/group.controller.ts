@@ -12,18 +12,8 @@ class GroupController {
             const { name } = req.body;
             const userId = req.user?.id;
 
-            // Validation
-            if (!name) {
-                res.status(400).json({ message: 'Group name is required.' });
-                return;
-            }
-            if (!userId) {
-                res.status(401).json({ message: 'User not authenticated.' });
-                return;
-            }
-
-            // Call Service
-            const newGroup = await groupService.createGroup(name, userId);
+            // Call Service (validation is now handled in service layer)
+            const newGroup = await groupService.createGroup(name, userId!);
 
             // Send Response
             res.status(201).json(newGroup);
@@ -31,7 +21,13 @@ class GroupController {
         } catch (error) {
             console.error(error);
             const message = (error instanceof Error) ? error.message : 'An unknown error occurred.';
-            res.status(500).json({ message: 'Error creating group.', error: message });
+            
+            // Handle validation errors (from service) with appropriate status codes
+            if (message.includes('required') || message.includes('authenticated')) {
+                res.status(400).json({ message });
+            } else {
+                res.status(500).json({ message: 'Error creating group.', error: message });
+            }
         }
     }
     
@@ -43,18 +39,8 @@ class GroupController {
             const { inviteCode } = req.body;
             const userId = req.user?.id;
 
-            // Validation
-            if (!inviteCode) {
-                res.status(400).json({ message: 'Invite code is required.' });
-                return;
-            }
-            if (!userId) {
-                res.status(401).json({ message: 'User not authenticated.' });
-                return;
-            }
-
-            // Call Service
-            const newMember = await groupService.joinGroup(inviteCode, userId);
+            // Call Service (validation is now handled in service layer)
+            const newMember = await groupService.joinGroup(inviteCode, userId!);
 
             // Send Response
             res.status(200).json({ message: 'Successfully joined group!', membership: newMember });
@@ -63,8 +49,9 @@ class GroupController {
             console.error(error);
             const message = (error instanceof Error) ? error.message : 'An unknown error occurred.';
             
-            // Handle specific errors from the service
-            if (message.includes('Invalid invite code') || message.includes('already a member')) {
+            // Handle specific errors from the service with appropriate status codes
+            if (message.includes('required') || message.includes('authenticated') || 
+                message.includes('Invalid invite code') || message.includes('already a member')) {
                 res.status(400).json({ message });
             } else {
                 res.status(500).json({ message: 'Error joining group.', error: message });
