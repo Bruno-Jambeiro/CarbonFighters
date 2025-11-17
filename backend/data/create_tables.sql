@@ -36,3 +36,15 @@ CREATE TABLE IF NOT EXISTS group_members (
     joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, group_id)
 );
+
+
+CREATE TABLE IF NOT EXISTS activities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    activity_type TEXT NOT NULL,
+    activity_description TEXT NOT NULL,
+    activity_title TEXT NOT NULL,
+    activity_date DATETIME NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    imagem_path TEXT NOT NULL,  -- path to image from the images directory
+    validated_by INTEGER REFERENCES users(id) DEFAULT NULL -- Initially null. When another user validates this activity it will be assigned to that user's id
+);

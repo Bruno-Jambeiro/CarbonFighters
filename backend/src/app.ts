@@ -1,6 +1,7 @@
 import express from 'express';
 import authRoutes from './routes/auth.routes';
 import groupRouthes from './routes/group.routes';
+import actionsRoutes from './routes/actions.routes';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
@@ -21,5 +22,6 @@ app.use(express.json());
 // Routes
 app.use('/auth', authRoutes);
 app.use('/groups', groupRouthes);
+app.use('/actions', actionsRoutes);
 
 export default app;
