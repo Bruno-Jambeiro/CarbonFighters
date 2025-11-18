@@ -4,6 +4,7 @@ import { getAuthData, actionsApi } from '../services/api';
 import type { AuthResponse } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
+import SingleAction from '../components/SingleAction';
 
 // Define action types
 interface Action {
@@ -183,10 +184,6 @@ function Activities() {
     } catch (err) {
       setFormError((err as Error).message);
     }
-  };
-
-  const getActionTypeInfo = (type: string) => {
-    return actionTypes.find(at => at.value === type) || actionTypes[actionTypes.length - 1];
   };
 
   if (!user) {
@@ -405,45 +402,9 @@ function Activities() {
             {!isLoading && !error && (
               <div className="space-y-4">
                 {myActions.length > 0 ? (
-                  myActions.map((action) => {
-                    const actionTypeInfo = getActionTypeInfo(action.activity_type);
-                    return (
-                      <div key={action.id} className="border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow">
-                        <div className="flex items-start justify-between mb-4">
-                          <div className="flex-1">
-                            <div className="flex items-center gap-2 mb-2">
-                              <span className={`inline-block px-3 py-1 text-xs font-semibold text-white rounded-full bg-gradient-to-r ${actionTypeInfo.color}`}>
-                                {actionTypeInfo.label}
-                              </span>
-                              {action.validated ? (
-                                <span className="inline-block px-2 py-1 text-xs font-semibold text-green-800 bg-green-100 rounded-full">
-                                  ✓ Verified
-                                </span>
-                              ) : (
-                                <span className="inline-block px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-100 rounded-full">
-                                  ⏳ Pending
-                                </span>
-                              )}
-                            </div>
-                            <h3 className="text-lg font-semibold text-gray-900 mb-2">{action.activity_title}</h3>
-                            <p className="text-gray-600 mb-3">{action.activity_description}</p>
-                            <div className="flex items-center gap-4 text-sm text-gray-500">
-                              <span>{new Date(action.activity_date).toLocaleDateString()}</span>
-                            </div>
-                            {action.image && (
-                              <div className="mt-3">
-                                <img
-                                  src={`data:image/jpeg;base64,${action.image}`}
-                                  alt={action.activity_title}
-                                  className="w-full h-48 object-cover rounded-lg"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })
+                  myActions.map((action) => (
+                    <SingleAction key={action.id} action={action} isOwnAction={true} />
+                  ))
                 ) : (
                   <div className="text-center py-8">
                     <div className="text-6xl mb-4">🌱</div>

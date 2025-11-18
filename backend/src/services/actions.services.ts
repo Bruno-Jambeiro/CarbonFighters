@@ -22,6 +22,22 @@ class ActionsService {
     public async listByUser(userId: number): Promise<Action[]> {
         return dbAll<Action>('SELECT * FROM activities WHERE user_id = ? ORDER BY id DESC', [userId]);
     }
+
+    /**
+     * Lists all actions performed by members of a given group.
+     * Returns activities joined with user basic info (firstName, lastName).
+     */
+    public async listByGroup(groupId: number): Promise<any[]> {
+        return dbAll<any>(
+            `SELECT a.*, u.firstName, u.lastName 
+             FROM activities a
+             INNER JOIN group_members gm ON gm.user_id = a.user_id
+             INNER JOIN users u ON u.id = a.user_id
+             WHERE gm.group_id = ?
+             ORDER BY datetime(a.activity_date) DESC`,
+            [groupId]
+        );
+    }
 }
 
 export const actionsService = new ActionsService();
