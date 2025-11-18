@@ -6,6 +6,7 @@ import Dashboard from './pages/Dashboard'
 import Profile from './pages/Profile'
 import Badges from './pages/Badges'
 import Groups from './pages/Groups'
+import GroupView from './pages/GroupView'
 import Activities from "./pages/Activities.tsx";
 
 function App() {
@@ -20,6 +21,7 @@ function App() {
             <Route path="/profile" element={<Profile />} />
             <Route path="/badges" element={<Badges />} />
             <Route path="/groups" element={<Groups />} />
+            <Route path="/groups/:groupId" element={<GroupView />} />
             <Route path="/activities" element={<Activities />} />
         </Routes>
       </div>

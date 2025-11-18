@@ -30,4 +30,11 @@ router.post('/join', authMiddleware, groupController.joinGroup);
  */
 router.get('/my-groups', authMiddleware, groupController.getMyGroups);
 
+/**
+ * @route GET /groups/:groupId/actions
+ * @desc Get all actions by members of a group
+ * @access Private
+ */
+router.get('/:groupId/actions', authMiddleware, (req, res) => groupController.getGroupActions(req, res));
+
 export default router;

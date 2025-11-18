@@ -19,7 +19,7 @@ export interface LoginData {
 export interface AuthResponse {
   token: string;
   user: {
-    id_user: number;
+    id: number;
     firstName: string;
     lastName: string;
     cpf: string;
@@ -156,6 +156,19 @@ export interface GroupMember {
   joined_at: string;
 }
 
+export interface GroupAction {
+  id: number;
+  activity_type: string;
+  activity_title: string;
+  activity_description: string;
+  activity_date: string;
+  user_id: number;
+  firstName: string;
+  lastName: string;
+  image: string;
+  validated: boolean;
+}
+
 // --- NEW GROUP API ---
 
 export const groupApi = {
@@ -181,6 +194,14 @@ export const groupApi = {
    */
   joinGroup: (inviteCode: string): Promise<{ message: string, membership: GroupMember }> => {
     return apiClient('/groups/join', 'POST', { inviteCode });
+  },
+
+  /**
+   * Fetches all actions by members of a specific group.
+   * Corresponds to: GET /groups/:groupId/actions
+   */
+  getGroupActions: (groupId: number): Promise<GroupAction[]> => {
+    return apiClient(`/groups/${groupId}/actions`, 'GET');
   },
 };
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { groupApi, getAuthData } from '../services/api';
-import type { Group } from '../services/api';
+import type { Group, AuthResponse } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
 
@@ -10,8 +10,8 @@ import Footer from '../components/Footer';
  */
 function Groups() {
   const navigate = useNavigate();
-  const [user, setUser] = useState<any>(null);
-  
+  const [user, setUser] = useState<AuthResponse['user'] | null>(null);
+
   // State for the component
   const [myGroups, setMyGroups] = useState<Group[]>([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -268,7 +268,10 @@ function Groups() {
                             </div>
                           </div>
                         </div>
-                        <button className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2">
+                        <button
+                          onClick={() => navigate(`/groups/${group.id}`)}
+                          className="bg-green-50 hover:bg-green-100 text-green-700 font-semibold py-2 px-4 rounded-lg transition-colors flex items-center gap-2"
+                        >
                           View
                           <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 5l7 7-7 7" />
