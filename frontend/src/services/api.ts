@@ -156,6 +156,64 @@ export interface GroupMember {
   joined_at: string;
 }
 
+// Actions interfaces
+export interface SustainableAction {
+  id: number;
+  user_id: number;
+  action_type: ActionType;
+  description: string;
+  carbon_saved: number;
+  points: number;
+  action_date: string;
+  created_at: string;
+}
+
+export type ActionType = 'transport' | 'recycling' | 'water' | 'energy' | 'food' | 'other';
+
+export interface ActionStats {
+  total_actions: number;
+  total_carbon_saved: number;
+  total_points: number;
+  current_streak: number;
+}
+
+export interface LogActionData {
+  action_type: ActionType;
+  description: string;
+  carbon_saved?: number;
+  points?: number;
+}
+
+// Badge interfaces
+export interface Badge {
+  id: number;
+  name: string;
+  description: string;
+  type: BadgeType;
+  icon: string;
+  requirement: number;
+  requirement_type: string;
+  category?: string;
+  points: number;
+  created_at: string;
+  earned_at?: string;
+}
+
+export type BadgeType = 'streak' | 'milestone' | 'special' | 'category';
+
+export interface Notification {
+  id: number;
+  user_id: number;
+  type: string;
+  title: string;
+  message: string;
+  badge_id?: number;
+  is_read: boolean;
+  created_at: string;
+  icon?: string;
+  badge_name?: string;
+}
+
 // --- NEW GROUP API ---
 
 export const groupApi = {
@@ -184,6 +242,85 @@ export const groupApi = {
   },
 };
 
+// --- ACTIONS API ---
+
+export const actionApi = {
+  /**
+   * Logs a new sustainable action
+   * Corresponds to: POST /actions
+   */
+  logAction: (data: LogActionData): Promise<{ 
+    message: string; 
+    action: SustainableAction; 
+    stats: ActionStats 
+  }> => {
+    return apiClient('/actions', 'POST', data);
+  },
+
+  /**
+   * Gets all actions for the current user
+   * Corresponds to: GET /actions
+   */
+  getMyActions: (): Promise<{ actions: SustainableAction[]; count: number }> => {
+    return apiClient('/actions', 'GET');
+  },
+
+  /**
+   * Gets stats for the current user (including current streak)
+   * Corresponds to: GET /actions/stats
+   */
+  getMyStats: (): Promise<ActionStats> => {
+    return apiClient('/actions/stats', 'GET');
+  },
+};
+
+// --- BADGES API ---
+
+export const badgeApi = {
+  /**
+   * Gets all available badges
+   * Corresponds to: GET /badges
+   */
+  getAllBadges: (): Promise<{ badges: Badge[] }> => {
+    return apiClient('/badges', 'GET');
+  },
+
+  /**
+   * Gets badges earned by the current user
+   * Corresponds to: GET /badges/my-badges
+   */
+  getMyBadges: (): Promise<{ badges: Badge[]; count: number }> => {
+    return apiClient('/badges/my-badges', 'GET');
+  },
+
+  /**
+   * Gets notifications for the current user
+   * Corresponds to: GET /badges/notifications
+   */
+  getMyNotifications: (unreadOnly: boolean = false): Promise<{ 
+    notifications: Notification[]; 
+    unreadCount: number 
+  }> => {
+    const query = unreadOnly ? '?unread=true' : '';
+    return apiClient(`/badges/notifications${query}`, 'GET');
+  },
+
+  /**
+   * Marks a notification as read
+   * Corresponds to: PUT /badges/notifications/:id/read
+   */
+  markNotificationAsRead: (notificationId: number): Promise<{ message: string }> => {
+    return apiClient(`/badges/notifications/${notificationId}/read`, 'PUT');
+  },
+
+  /**
+   * Marks all notifications as read
+   * Corresponds to: PUT /badges/notifications/read-all
+   */
+  markAllNotificationsAsRead: (): Promise<{ message: string }> => {
+    return apiClient('/badges/notifications/read-all', 'PUT');
+  },
+};
 export interface Action {
     id: number;
     activity_type: string;
@@ -245,5 +382,64 @@ export const actionsApi = {
         return response.json();
     },
 
+};
+
+// --- USER PROFILE & STREAK API ---
+
+export interface StreakInfo {
+    current_streak: number;
+    last_action_date: string | null;
+    is_active: boolean;
+}
+
+export interface StreakWarning {
+    warning: boolean;
+    daysRemaining: number;
+}
+
+export interface StreakDetails extends StreakInfo {
+    warning: StreakWarning;
+    grace_period_days: number;
+    message: string;
+}
+
+export interface UserStats {
+    totalActions: number;
+    actionsByCategory: Record<string, number>;
+    recentActions: Action[];
+}
+
+export interface UserProfile {
+    streak: StreakInfo & { warning: StreakWarning };
+    stats: UserStats;
+    badges: number;
+    badgesList: Badge[];
+    groups: number;
+}
+
+export const userApi = {
+    /**
+     * Gets comprehensive user profile
+     * Corresponds to: GET /user/profile
+     */
+    getProfile: (): Promise<UserProfile> => {
+        return apiClient('/user/profile', 'GET');
+    },
+
+    /**
+     * Gets detailed streak information
+     * Corresponds to: GET /user/streak
+     */
+    getStreak: (): Promise<StreakDetails> => {
+        return apiClient('/user/streak', 'GET');
+    },
+
+    /**
+     * Gets user activity statistics
+     * Corresponds to: GET /user/stats
+     */
+    getStats: (): Promise<UserStats> => {
+        return apiClient('/user/stats', 'GET');
+    },
 };
 

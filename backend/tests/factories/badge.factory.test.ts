@@ -202,11 +202,15 @@ describe('BadgeFactory', () => {
                 expect(badge.icon).toBeTruthy();
             });
 
-            it('should not include optional fields (id, created_at) in created badges', () => {
+            it('should not include DB-generated fields (id, created_at) in created badges', () => {
                 const badge = BadgeFactory.createBadge(BadgeType.MILESTONE, 100);
                 
-                expect(badge.id).toBeUndefined();
-                expect(badge.created_at).toBeUndefined();
+                // BadgeInput type doesn't have id and created_at - they are added by the database
+                expect('id' in badge).toBe(false);
+                expect('created_at' in badge).toBe(false);
+                
+                // But should have requirement_type
+                expect(badge.requirement_type).toBeDefined();
             });
         });
     });
