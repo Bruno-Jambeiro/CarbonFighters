@@ -3,6 +3,8 @@ import authRoutes from './routes/auth.routes';
 import groupRouthes from './routes/group.routes';
 import actionRoutes from './routes/action.routes';
 import badgeRoutes from './routes/badge.routes';
+import actionsRoutes from './routes/actions.routes';
+import userRoutes from './routes/user.routes';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
@@ -25,5 +27,7 @@ app.use('/auth', authRoutes);
 app.use('/groups', groupRouthes);
 app.use('/actions', actionRoutes);
 app.use('/badges', badgeRoutes);
+app.use('/actions', actionsRoutes);
+app.use('/user', userRoutes);
 
 export default app;

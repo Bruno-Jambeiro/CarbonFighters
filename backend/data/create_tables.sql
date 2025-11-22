@@ -13,8 +13,6 @@ CREATE TABLE IF NOT EXISTS users (
     phone TEXT,
     birthday TEXT,
     password TEXT NOT NULL,
-    current_streak INTEGER DEFAULT 0,
-    last_action_date DATE,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -37,6 +35,17 @@ CREATE TABLE IF NOT EXISTS group_members (
     group_id INTEGER NOT NULL REFERENCES groups(id) ON DELETE CASCADE,
     joined_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     PRIMARY KEY (user_id, group_id)
+);
+
+CREATE TABLE IF NOT EXISTS activities (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    activity_type TEXT NOT NULL,
+    activity_description TEXT NOT NULL,
+    activity_title TEXT NOT NULL,
+    activity_date DATETIME NOT NULL,
+    user_id INTEGER NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    imagem_path TEXT NOT NULL,  -- path to image from the images directory
+    validated_by INTEGER REFERENCES users(id) DEFAULT NULL -- Initially null. When another user validates this activity it will be assigned to that user's id
 );
 
 -- =========================
@@ -93,3 +102,11 @@ CREATE TABLE IF NOT EXISTS notifications (
     is_read BOOLEAN DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+-- =========================
+-- Add streak columns to users table if they don't exist
+-- =========================
+-- SQLite doesn't support ALTER TABLE IF NOT EXISTS, so we check via a trigger approach
+-- These columns will be added by the application if missing
+
+

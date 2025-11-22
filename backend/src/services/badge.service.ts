@@ -65,9 +65,9 @@ export async function checkAndAwardBadges(userId: number): Promise<Badge[]> {
 async function checkBadgeRequirement(userId: number, badge: Badge): Promise<boolean> {
     switch (badge.requirement_type) {
         case RequirementType.ACTIONS_COUNT: {
-            // Check total number of actions
+            // Check total number of actions from activities table
             const result = await dbGet<{ count: number }>(
-                'SELECT COUNT(*) as count FROM sustainable_actions WHERE user_id = ?',
+                'SELECT COUNT(*) as count FROM activities WHERE user_id = ?',
                 [userId]
             );
             return (result?.count || 0) >= badge.requirement;
@@ -92,10 +92,10 @@ async function checkBadgeRequirement(userId: number, badge: Badge): Promise<bool
         }
 
         case RequirementType.CATEGORY_COUNT: {
-            // Check actions by category
+            // Check actions by category from activities table
             if (!badge.category) return false;
             const result = await dbGet<{ count: number }>(
-                'SELECT COUNT(*) as count FROM sustainable_actions WHERE user_id = ? AND action_type = ?',
+                'SELECT COUNT(*) as count FROM activities WHERE user_id = ? AND activity_type = ?',
                 [userId, badge.category]
             );
             return (result?.count || 0) >= badge.requirement;

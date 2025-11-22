@@ -102,7 +102,7 @@ const apiClient = async (
     console.error('No token found for authenticated request');
     clearAuthData();
     // Force a reload to login page
-    // NOTE: might cause problems redirecting unexpectedly, chage later if needed (possible code smell)
+    // NOTE: might cause problems redirecting unexpectedly, change later if needed (possible code smell)
     window.location.href = '/login';
     throw new Error('User not authenticated.');
   }
@@ -122,7 +122,7 @@ const apiClient = async (
     // Token is invalid or expired
     console.error('Authentication failed (401)');
     clearAuthData();
-    // NOTE: might cause problems redirecting unexpectedly, chage later if needed (possible code smell)
+    // NOTE: might cause problems redirecting unexpectedly, change later if needed (possible code smell)
     window.location.href = '/login';
     throw new Error('Session expired. Please log in again.');
   }
@@ -321,3 +321,125 @@ export const badgeApi = {
     return apiClient('/badges/notifications/read-all', 'PUT');
   },
 };
+export interface Action {
+    id: number;
+    activity_type: string;
+    activity_title: string;
+    activity_description: string;
+    activity_date: string;
+    image: string;
+    validated: boolean;
+}
+
+export const actionsApi = {
+    /**
+     * Fetches all actions for the currently logged-in user.
+     * Corresponds to: GET /actions/my-actions
+     */
+    getMyActions: (): Promise<Action[]> => {
+        return apiClient('/actions/my-actions', 'GET');
+    },
+
+    /**
+     * Creates a new action with file upload using FormData.
+     * Corresponds to: POST /action
+     */
+    createAction: async (activity_type: string, activity_title: string, activity_description: string, activity_date: Date, imageFile: File): Promise<Action> => {
+        const { token } = getAuthData();
+
+        if (!token) {
+            clearAuthData();
+            window.location.href = '/login';
+            throw new Error('User not authenticated.');
+        }
+
+        const formData = new FormData();
+        formData.append('activity_type', activity_type);
+        formData.append('activity_title', activity_title);
+        formData.append('activity_description', activity_description);
+        formData.append('activity_date', activity_date.toISOString());
+        formData.append('image', imageFile);
+
+        const response = await fetch(`${API_URL}/actions`, {
+            method: 'POST',
+            headers: {
+                'Authorization': `Bearer ${token}`,
+            },
+            body: formData,
+        });
+
+        if (response.status === 401) {
+            clearAuthData();
+            window.location.href = '/login';
+            throw new Error('Session expired. Please log in again.');
+        }
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.message || `API request failed: ${response.status}`);
+        }
+
+        return response.json();
+    },
+
+};
+
+// --- USER PROFILE & STREAK API ---
+
+export interface StreakInfo {
+    current_streak: number;
+    last_action_date: string | null;
+    is_active: boolean;
+}
+
+export interface StreakWarning {
+    warning: boolean;
+    daysRemaining: number;
+}
+
+export interface StreakDetails extends StreakInfo {
+    warning: StreakWarning;
+    grace_period_days: number;
+    message: string;
+}
+
+export interface UserStats {
+    totalActions: number;
+    actionsByCategory: Record<string, number>;
+    recentActions: Action[];
+}
+
+export interface UserProfile {
+    streak: StreakInfo & { warning: StreakWarning };
+    stats: UserStats;
+    badges: number;
+    badgesList: Badge[];
+    groups: number;
+}
+
+export const userApi = {
+    /**
+     * Gets comprehensive user profile
+     * Corresponds to: GET /user/profile
+     */
+    getProfile: (): Promise<UserProfile> => {
+        return apiClient('/user/profile', 'GET');
+    },
+
+    /**
+     * Gets detailed streak information
+     * Corresponds to: GET /user/streak
+     */
+    getStreak: (): Promise<StreakDetails> => {
+        return apiClient('/user/streak', 'GET');
+    },
+
+    /**
+     * Gets user activity statistics
+     * Corresponds to: GET /user/stats
+     */
+    getStats: (): Promise<UserStats> => {
+        return apiClient('/user/stats', 'GET');
+    },
+};
+
