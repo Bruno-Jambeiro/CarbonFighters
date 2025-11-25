@@ -9,233 +9,68 @@
 
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { getAuthData } from '../services/api';
+import { getAuthData, badgeApi, type Badge, type BadgeType } from '../services/api';
 //import HeaderDash from '../components/headers/HeaderDash';
 import FooterDash from '../components/footer/FooterDash';
 import Navbar from '../components/Navbar';
 
-// Badge types - must match backend enum
-const BadgeType = {
-  STREAK: 'streak',
-  MILESTONE: 'milestone',
-  SPECIAL: 'special',
-  CATEGORY: 'category'
-} as const;
-
-type BadgeType = typeof BadgeType[keyof typeof BadgeType];
-
-// Badge interface - must match backend model
-interface Badge {
-  id?: number;
-  name: string;
-  description: string;
-  type: BadgeType;
-  icon: string;
-  requirement: number;
-  points: number;
-  created_at?: string;
-}
-
 export default function Badges() {
   const navigate = useNavigate();
   const [user, setUser] = useState<any>(null);
-  const [badges, setBadges] = useState<Badge[]>([]);
+  const [allBadges, setAllBadges] = useState<Badge[]>([]);
   const [userBadges, setUserBadges] = useState<Badge[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedType, setSelectedType] = useState<BadgeType | 'all'>('all');
-  const [userEmail, setUserEmail] = useState<string>('');
 
   useEffect(() => {
-    // Get user from localStorage (simulating logged in user)
+    // Get user from localStorage
     const { token, user: userData } = getAuthData();
     if (!token || !userData) {
-            navigate('/login');
-            return;
-        }
-        setUser(userData);
-
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        setUserEmail(user.email || 'Usuario');
-      } catch (e) {
-        setUserEmail('Usuario Demo');
-      }
+      navigate('/login');
+      return;
     }
-
-    // Demo data: Example badges created using BadgeFactory pattern
-    // In a real app, this would be fetched from API: GET /api/badges
-    const exampleBadges: Badge[] = [
-      // STREAK Badges
-      {
-        name: '7 Dias de Fogo',
-        description: 'Mantenha uma sequência de 7 dias consecutivos de ações sustentáveis',
-        type: BadgeType.STREAK,
-        icon: '🔥',
-        requirement: 7,
-        points: 70
-      },
-      {
-        name: 'Mestre da Consistência',
-        description: 'Complete ações sustentáveis por 30 dias seguidos',
-        type: BadgeType.STREAK,
-        icon: '🔥',
-        requirement: 30,
-        points: 300
-      },
-      {
-        name: 'Lenda Sustentável',
-        description: 'Alcance uma sequência incrível de 100 dias de ações ecológicas',
-        type: BadgeType.STREAK,
-        icon: '🔥',
-        requirement: 100,
-        points: 1000
-      },
-      
-      // MILESTONE Badges
-      {
-        name: 'Primeiro Passo',
-        description: 'Complete suas primeiras 10 ações sustentáveis',
-        type: BadgeType.MILESTONE,
-        icon: '👣',
-        requirement: 10,
-        points: 10
-      },
-      {
-        name: 'Eco Rookie',
-        description: 'Alcance 100 ações sustentáveis completas',
-        type: BadgeType.MILESTONE,
-        icon: '🌱',
-        requirement: 100,
-        points: 100
-      },
-      {
-        name: 'Eco Warrior',
-        description: 'Complete 500 ações em prol do meio ambiente',
-        type: BadgeType.MILESTONE,
-        icon: '⚔️',
-        requirement: 500,
-        points: 500
-      },
-      {
-        name: 'Eco Legend',
-        description: 'Atinja a marca de 1000 ações sustentáveis!',
-        type: BadgeType.MILESTONE,
-        icon: '👑',
-        requirement: 1000,
-        points: 1000
-      },
-      
-      // SPECIAL Event Badges
-      {
-        name: 'Dia da Terra 2025',
-        description: 'Participe das ações especiais do Dia da Terra',
-        type: BadgeType.SPECIAL,
-        icon: '⭐',
-        requirement: 1,
-        points: 500
-      },
-      {
-        name: 'Campeão Zero Waste',
-        description: 'Complete o desafio Zero Waste de uma semana',
-        type: BadgeType.SPECIAL,
-        icon: '⭐',
-        requirement: 1,
-        points: 750
-      },
-      
-      // CATEGORY Badges
-      {
-        name: 'Mestre do Transporte Verde',
-        description: 'Complete 50 ações na categoria de transporte sustentável',
-        type: BadgeType.CATEGORY,
-        icon: '🚲',
-        requirement: 50,
-        points: 300
-      },
-      {
-        name: 'Rei da Reciclagem',
-        description: 'Realize 50 ações de reciclagem',
-        type: BadgeType.CATEGORY,
-        icon: '♻️',
-        requirement: 50,
-        points: 300
-      },
-      {
-        name: 'Guardião da Água',
-        description: 'Complete 50 ações de conservação de água',
-        type: BadgeType.CATEGORY,
-        icon: '💧',
-        requirement: 50,
-        points: 300
-      }
-    ];
-
-    setBadges(exampleBadges);
-
-    // Simulate user's earned badges (would come from API: GET /api/users/:id/badges)
-    // For demo: test@gmail.com has earned 3 badges
-    const earnedBadges: Badge[] = [
-      // User completed 7 days streak
-      {
-        id: 1,
-        name: '7 Dias de Fogo',
-        description: 'Mantenha uma sequência de 7 dias consecutivos de ações sustentáveis',
-        type: BadgeType.STREAK,
-        icon: '🔥',
-        requirement: 7,
-        points: 70,
-        created_at: new Date(2025, 10, 1).toISOString() // Earned Nov 1, 2025
-      },
-      // User reached 100 actions
-      {
-        id: 2,
-        name: 'Eco Rookie',
-        description: 'Alcance 100 ações sustentáveis completas',
-        type: BadgeType.MILESTONE,
-        icon: '🌱',
-        requirement: 100,
-        points: 100,
-        created_at: new Date(2025, 10, 5).toISOString() // Earned Nov 5, 2025
-      },
-      // User participated in Earth Day event
-      {
-        id: 3,
-        name: 'Dia da Terra 2025',
-        description: 'Participe das ações especiais do Dia da Terra',
-        type: BadgeType.SPECIAL,
-        icon: '⭐',
-        requirement: 1,
-        points: 500,
-        created_at: new Date(2025, 3, 22).toISOString() // Earned Apr 22, 2025
-      }
-    ];
-
-    setUserBadges(earnedBadges);
-    setLoading(false);
+    setUser(userData);
+    loadBadges();
   }, [navigate]);
 
+  const loadBadges = async () => {
+    try {
+      setLoading(true);
+      // 4.2 CA1 & CA4: Load all available badges from the API
+      const allBadgesData = await badgeApi.getAllBadges();
+      setAllBadges(allBadgesData.badges);
+
+      // 4.2 CA2 & CA4: Load badges earned by the user
+      const myBadgesData = await badgeApi.getMyBadges();
+      setUserBadges(myBadgesData.badges);
+    } catch (error) {
+      console.error('Error loading badges:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // 4.2 CA4: Filter badges based on the selected type
   const filteredBadges = selectedType === 'all' 
-    ? badges 
-    : badges.filter(badge => badge.type === selectedType);
+    ? allBadges 
+    : allBadges.filter((badge: Badge) => badge.type === selectedType);
 
   const getBadgeTypeColor = (type: BadgeType): string => {
-    const colors = {
-      [BadgeType.STREAK]: 'bg-orange-100 text-orange-800 border-orange-300',
-      [BadgeType.MILESTONE]: 'bg-green-100 text-green-800 border-green-300',
-      [BadgeType.SPECIAL]: 'bg-purple-100 text-purple-800 border-purple-300',
-      [BadgeType.CATEGORY]: 'bg-blue-100 text-blue-800 border-blue-300'
+    const colors: Record<BadgeType, string> = {
+      'streak': 'bg-orange-100 text-orange-800 border-orange-300',
+      'milestone': 'bg-green-100 text-green-800 border-green-300',
+      'special': 'bg-purple-100 text-purple-800 border-purple-300',
+      'category': 'bg-blue-100 text-blue-800 border-blue-300'
     };
     return colors[type];
   };
 
   const getBadgeTypeName = (type: BadgeType): string => {
-    const names = {
-      [BadgeType.STREAK]: 'Streak',
-      [BadgeType.MILESTONE]: 'Milestone',
-      [BadgeType.SPECIAL]: 'Special',
-      [BadgeType.CATEGORY]: 'Category'
+    const names: Record<BadgeType, string> = {
+      'streak': 'Streak',
+      'milestone': 'Milestone',
+      'special': 'Special',
+      'category': 'Category'
     };
     return names[type];
   };
@@ -277,8 +112,7 @@ export default function Badges() {
                   My Earned Badges
                 </h1>
                 <p className="text-gray-600 mt-1">
-                  {userEmail && `${userEmail} - `}
-                  {userBadges.length} badge{userBadges.length !== 1 ? 's' : ''} earned
+                  {user?.name || user?.email || 'Usuario'} - {userBadges.length} badge{userBadges.length !== 1 ? 's' : ''} earned
                 </p>
               </div>
               <div className="text-right">
@@ -348,20 +182,20 @@ export default function Badges() {
                 <div>
                   <h3 className="font-bold text-gray-900 mb-2">Keep going!</h3>
                   <p className="text-gray-700 text-sm mb-3">
-                    You've earned {userBadges.length} out of {badges.length} available badges. 
+                    You've earned {userBadges.length} out of {allBadges.length} available badges. 
                     Continue performing sustainable actions to unlock more!
                   </p>
                   <div className="flex gap-4 text-sm">
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-green-500 rounded-full"></div>
                       <span className="text-gray-600">
-                        {Math.round((userBadges.length / badges.length) * 100)}% complete
+                        {Math.round((userBadges.length / allBadges.length) * 100)}% complete
                       </span>
                     </div>
                     <div className="flex items-center gap-2">
                       <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
                       <span className="text-gray-600">
-                        {badges.length - userBadges.length} badges remaining
+                        {allBadges.length - userBadges.length} badges remaining
                       </span>
                     </div>
                   </div>
@@ -387,10 +221,11 @@ export default function Badges() {
                 : 'bg-white text-gray-700 hover:bg-gray-100 border border-gray-300'
             }`}
           >
-            Todos ({badges.length})
+            Todos ({allBadges.length})
           </button>
-          {Object.values(BadgeType).map((type) => {
-            const count = badges.filter(b => b.type === type).length;
+          {/* CA4: Filtros por tipo de badge */}
+          {(['streak', 'milestone', 'special', 'category'] as BadgeType[]).map((type) => {
+            const count = allBadges.filter((b: Badge) => b.type === type).length;
             return (
               <button
                 key={type}

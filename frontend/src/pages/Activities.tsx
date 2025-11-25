@@ -26,10 +26,53 @@ const actionTypes = [
   { value: 'transport', label: '🚲 Sustainable Transport', color: 'from-blue-500 to-cyan-500' },
   { value: 'energy', label: '⚡ Energy Conservation', color: 'from-yellow-500 to-orange-500' },
   { value: 'waste', label: '♻️ Waste Reduction', color: 'from-green-500 to-emerald-500' },
-  { value: 'food', label: '🌱 Sustainable Food', color: 'from-purple-500 to-pink-500' },
+  { value: 'food', label: '🌱 Plant-Based Meal', color: 'from-purple-500 to-pink-500' },
   { value: 'water', label: '💧 Water Conservation', color: 'from-blue-400 to-blue-600' },
   { value: 'other', label: '🌍 Other Eco-Action', color: 'from-gray-500 to-gray-600' },
 ];
+
+const transportTypes = [
+  { value: 'electric', label: 'Electric Vehicle' },
+  { value: 'ethanol', label: 'Ethanol Vehicle (Flex Fuel)' },
+  { value: 'bicycle', label: 'Bicycle' },
+  { value: 'walking', label: 'Walking' },
+];
+
+const calculateTransportCO2 = (transportType: string, distanceKm: number): number => {
+  const avgCarEmissions = 0.12; // kg CO2 per km for average gasoline car
+  
+  const emissionFactors: Record<string, number> = {
+    'electric': 0.05,
+    'ethanol': 0.08,
+    'bicycle': 0,
+    'walking': 0
+  };
+  
+  const transportEmissions = emissionFactors[transportType] || 0;
+  const savedEmissions = (avgCarEmissions - transportEmissions) * distanceKm;
+  
+  return Math.max(0, savedEmissions); // ensure non-negative values
+};
+
+const calculateEnergyCO2 = (kwhSaved: number): number => {
+  const emissionFactor = 0.5; // kg CO2 per kWh
+  return kwhSaved * emissionFactor;
+};
+
+const calculateWasteCO2 = (kgWasteReduced: number): number => {
+  const emissionFactor = 0.7; // kg CO2 per kg of waste
+  return kgWasteReduced * emissionFactor;
+};
+
+const calculateFoodCO2 = (mealsCount: number): number => {
+  const emissionSavedPerMeal = 6.3; // kg CO2 saved per plant-based meal vs meat meal
+  return mealsCount * emissionSavedPerMeal;
+};
+
+const calculateWaterCO2 = (litersSaved: number): number => {
+  const emissionFactor = 0.0003; // kg CO2 per liter saved
+  return litersSaved * emissionFactor;
+};
 
 function Activities() {
   const navigate = useNavigate();
@@ -51,6 +94,14 @@ function Activities() {
   const [imagePreview, setImagePreview] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
+  // Category-specific fields
+  const [transportType, setTransportType] = useState('electric');
+  const [distance, setDistance] = useState('');
+  const [energySaved, setEnergySaved] = useState('');
+  const [wasteReduced, setWasteReduced] = useState('');
+  const [mealsCount, setMealsCount] = useState('');
+  const [waterSaved, setWaterSaved] = useState('');
+
   // Check authentication and fetch user's actions
   useEffect(() => {
     const { token, user: userData } = getAuthData();
@@ -63,6 +114,63 @@ function Activities() {
     setUser(userData);
     fetchActions();
   }, [navigate]);
+
+  // Auto-calculate CO2 based on category-specific fields
+  useEffect(() => {
+    if (selectedActionType === 'other') {
+      // For "other" category, don't auto-calculate - let user input manually
+      return;
+    }
+
+    let calculatedCO2 = 0;
+
+    switch (selectedActionType) {
+      case 'transport':
+        const dist = parseFloat(distance);
+        if (!isNaN(dist) && dist > 0) {
+          calculatedCO2 = calculateTransportCO2(transportType, dist);
+        }
+        break;
+      case 'energy':
+        const kwh = parseFloat(energySaved);
+        if (!isNaN(kwh) && kwh > 0) {
+          calculatedCO2 = calculateEnergyCO2(kwh);
+        }
+        break;
+      case 'waste':
+        const kg = parseFloat(wasteReduced);
+        if (!isNaN(kg) && kg > 0) {
+          calculatedCO2 = calculateWasteCO2(kg);
+        }
+        break;
+      case 'food':
+        const meals = parseFloat(mealsCount);
+        if (!isNaN(meals) && meals > 0) {
+          calculatedCO2 = calculateFoodCO2(meals);
+        }
+        break;
+      case 'water':
+        const liters = parseFloat(waterSaved);
+        if (!isNaN(liters) && liters > 0) {
+          calculatedCO2 = calculateWaterCO2(liters);
+        }
+        break;
+    }
+
+    // Round to 2 decimal places
+    setCarbonSaved(calculatedCO2 > 0 ? calculatedCO2.toFixed(2) : '');
+  }, [selectedActionType, transportType, distance, energySaved, wasteReduced, mealsCount, waterSaved]);
+
+  // Reset category-specific fields when action type changes
+  useEffect(() => {
+    setTransportType('electric');
+    setDistance('');
+    setEnergySaved('');
+    setWasteReduced('');
+    setMealsCount('');
+    setWaterSaved('');
+    setCarbonSaved('');
+  }, [selectedActionType]);
 
   /**
    * Fetches the user's actions and updates the state.
@@ -142,6 +250,41 @@ function Activities() {
       setFormError('Action description is required.');
       return;
     }
+
+    // Validate category-specific fields
+    switch (selectedActionType) {
+      case 'transport':
+        if (!distance || parseFloat(distance) <= 0) {
+          setFormError('Please enter a valid distance traveled.');
+          return;
+        }
+        break;
+      case 'energy':
+        if (!energySaved || parseFloat(energySaved) <= 0) {
+          setFormError('Please enter a valid amount of energy saved.');
+          return;
+        }
+        break;
+      case 'waste':
+        if (!wasteReduced || parseFloat(wasteReduced) <= 0) {
+          setFormError('Please enter a valid amount of waste reduced.');
+          return;
+        }
+        break;
+      case 'food':
+        if (!mealsCount || parseFloat(mealsCount) <= 0) {
+          setFormError('Please enter a valid number of plant-based meals.');
+          return;
+        }
+        break;
+      case 'water':
+        if (!waterSaved || parseFloat(waterSaved) <= 0) {
+          setFormError('Please enter a valid amount of water saved.');
+          return;
+        }
+        break;
+    }
+
     if (!carbonSaved || parseFloat(carbonSaved) <= 0) {
       setFormError('Please enter a valid carbon saved amount.');
       return;
@@ -169,6 +312,14 @@ function Activities() {
         setCarbonSaved('');
         setSelectedFile(null);
         setSelectedActionType('transport');
+        
+        // Clear category-specific fields
+        setTransportType('electric');
+        setDistance('');
+        setEnergySaved('');
+        setWasteReduced('');
+        setMealsCount('');
+        setWaterSaved('');
 
         // Clear image preview
         if (imagePreview) {
@@ -286,10 +437,129 @@ function Activities() {
                   />
                 </div>
 
+                {/* Category-Specific Fields */}
+                {selectedActionType === 'transport' && (
+                  <>
+                    <div className="mb-6">
+                      <label htmlFor="transportType" className="block text-sm font-medium text-gray-700 mb-2">
+                        Type of Transportation <span className="text-red-500">*</span>
+                      </label>
+                      <select
+                        id="transportType"
+                        value={transportType}
+                        onChange={(e) => setTransportType(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                        required
+                      >
+                        {transportTypes.map(type => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div className="mb-6">
+                      <label htmlFor="distance" className="block text-sm font-medium text-gray-700 mb-2">
+                        Distance Traveled (km) <span className="text-red-500">*</span>
+                      </label>
+                      <input
+                        type="number"
+                        step="0.1"
+                        min="0"
+                        id="distance"
+                        value={distance}
+                        onChange={(e) => setDistance(e.target.value)}
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                        placeholder="e.g., 15.5"
+                        required
+                      />
+                    </div>
+                  </>
+                )}
+
+                {selectedActionType === 'energy' && (
+                  <div className="mb-6">
+                    <label htmlFor="energySaved" className="block text-sm font-medium text-gray-700 mb-2">
+                      Energy Saved (kWh) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      id="energySaved"
+                      value={energySaved}
+                      onChange={(e) => setEnergySaved(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      placeholder="e.g., 10.5"
+                      required
+                    />
+                  </div>
+                )}
+
+                {selectedActionType === 'waste' && (
+                  <div className="mb-6">
+                    <label htmlFor="wasteReduced" className="block text-sm font-medium text-gray-700 mb-2">
+                      Waste Reduced (kg) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      id="wasteReduced"
+                      value={wasteReduced}
+                      onChange={(e) => setWasteReduced(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      placeholder="e.g., 5.0"
+                      required
+                    />
+                  </div>
+                )}
+
+                {selectedActionType === 'food' && (
+                  <div className="mb-6">
+                    <label htmlFor="mealsCount" className="block text-sm font-medium text-gray-700 mb-2">
+                      Number of Plant-Based Meals <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      step="1"
+                      min="0"
+                      id="mealsCount"
+                      value={mealsCount}
+                      onChange={(e) => setMealsCount(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      placeholder="e.g., 3"
+                      required
+                    />
+                  </div>
+                )}
+
+                {selectedActionType === 'water' && (
+                  <div className="mb-6">
+                    <label htmlFor="waterSaved" className="block text-sm font-medium text-gray-700 mb-2">
+                      Water Saved (liters) <span className="text-red-500">*</span>
+                    </label>
+                    <input
+                      type="number"
+                      step="0.1"
+                      min="0"
+                      id="waterSaved"
+                      value={waterSaved}
+                      onChange={(e) => setWaterSaved(e.target.value)}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
+                      placeholder="e.g., 50.0"
+                      required
+                    />
+                  </div>
+                )}
+
                 {/* Carbon Saved */}
                 <div className="mb-6">
                   <label htmlFor="carbonSaved" className="block text-sm font-medium text-gray-700 mb-2">
                     Estimated Carbon Saved (kg CO₂)
+                    {selectedActionType !== 'other' && (
+                      <span className="ml-2 text-xs text-gray-500">(Auto-calculated)</span>
+                    )}
                   </label>
                   <input
                     type="number"
@@ -299,7 +569,14 @@ function Activities() {
                     onChange={(e) => setCarbonSaved(e.target.value)}
                     className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent transition-colors"
                     placeholder="0.0"
+                    readOnly={selectedActionType !== 'other'}
+                    disabled={selectedActionType !== 'other'}
                   />
+                  {selectedActionType !== 'other' && (
+                    <p className="mt-1 text-xs text-gray-500">
+                      This value is automatically calculated based on your input
+                    </p>
+                  )}
                 </div>
 
                 {/* Image Upload */}

@@ -82,6 +82,32 @@ async function initializeDatabase(db: Database<sqlite3.Database, sqlite3.Stateme
 
     await db.exec(ddl);
     console.log(`📊 Database schema initialized from SQL file: ${usedPath}`);
+    
+    // Add streak columns if they don't exist
+    await ensureStreakColumns(db);
+}
+
+async function ensureStreakColumns(db: Database<sqlite3.Database, sqlite3.Statement>): Promise<void> {
+    try {
+        // Check if columns exist by querying table info
+        const tableInfo = await db.all("PRAGMA table_info(users)");
+        const hasCurrentStreak = tableInfo.some((col: any) => col.name === 'current_streak');
+        const hasLastActionDate = tableInfo.some((col: any) => col.name === 'last_action_date');
+        
+        // Add columns if missing
+        if (!hasCurrentStreak) {
+            await db.exec('ALTER TABLE users ADD COLUMN current_streak INTEGER DEFAULT 0');
+            console.log('✅ Added current_streak column to users table');
+        }
+        
+        if (!hasLastActionDate) {
+            await db.exec('ALTER TABLE users ADD COLUMN last_action_date DATE');
+            console.log('✅ Added last_action_date column to users table');
+        }
+    } catch (error) {
+        console.error('Error ensuring streak columns:', error);
+        // Don't throw - let the app continue even if this fails
+    }
 }
 
 export async function dbRun(sql: string, params?: any[]): Promise<{ lastID?: number, changes?: number }> {
