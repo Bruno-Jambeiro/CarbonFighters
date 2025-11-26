@@ -1,3 +1,8 @@
+/**
+ * Note: This file covers end-to-end groups endpoints and is NOT directly part of the A5 criteria.
+ * It demonstrates functional coverage (without specific EP/BVA/Pairwise) for /groups.
+ */
+
 import request from 'supertest';
 import app from '../../src/app'; // Assumes app is exported from src/app.ts
 import { dbRun, dbGet } from '../../src/services/db.service';
