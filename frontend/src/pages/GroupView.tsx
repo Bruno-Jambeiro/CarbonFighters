@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { getAuthData, groupApi } from '../services/api';
+import { actionApi, getAuthData, groupApi } from '../services/api';
 import type { AuthResponse, GroupAction } from '../services/api';
 import Navbar from '../components/Navbar';
 import Footer from '../components/Footer';
@@ -60,6 +60,11 @@ function GroupView() {
     };
     return types[type] || types.other;
   };
+
+  const validateAction = (id: number) => {
+    actionApi.validateAction(id);
+    setGroupActions(groupActions.map(a => a.id !== id ? a : { ...a, validated: true }))
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 flex flex-col">
@@ -132,7 +137,7 @@ function GroupView() {
                         {/* Message Bubble */}
                         <div className={`flex flex-col ${isOwnAction ? 'items-end' : 'items-start'}`}>
                           {/* Name and Time */}
-                          <div className={`flex items-center gap-2 mb-1 ${isOwnAction ? 'flex-row-reverse' : 'flex-row'}`}>
+                          <div className={`flex items-center gap-2 mb-1 w-full ${isOwnAction ? 'flex-row-reverse' : 'flex-row'}`}>
                             <span className="text-sm font-medium text-gray-700">
                               {isOwnAction ? 'You' : `${action.firstName} ${action.lastName}`}
                             </span>
@@ -148,11 +153,10 @@ function GroupView() {
 
                           {/* Action Bubble */}
                           <div
-                            className={`rounded-2xl p-4 shadow-md ${
-                              isOwnAction 
-                                ? 'bg-green-500 text-white rounded-tr-none' 
-                                : 'bg-white text-gray-900 rounded-tl-none'
-                            }`}
+                            className={`rounded-2xl p-4 shadow-md ${isOwnAction
+                              ? 'bg-green-500 text-white rounded-tr-none'
+                              : 'bg-white text-gray-900 rounded-tl-none'
+                              }`}
                             style={{ maxWidth: '450px' }}
                           >
                             {/* Action Type Badge */}
@@ -163,11 +167,17 @@ function GroupView() {
                               <span className={`text-xs font-semibold ${isOwnAction ? 'text-green-100' : 'text-gray-600'}`}>
                                 {actionType.label}
                               </span>
-                              {action.validated && (
+                              {action.validated ? (
                                 <span className={`text-xs px-2 py-0.5 rounded-full ${isOwnAction ? 'bg-green-400 text-green-900' : 'bg-green-100 text-green-800'}`}>
                                   ✓ Verified
                                 </span>
-                              )}
+                              ) : (
+                                !isOwnAction &&
+                                <span className={`text-xs px-2 py-0.5 rounded-full bg-yellow-100 text-yellow-800 cursor-pointer`} onClick={() => validateAction(action.id)}>
+                                  Click to Validate this action
+                                </span>
+                              )
+                              }
                             </div>
 
                             {/* Title */}
