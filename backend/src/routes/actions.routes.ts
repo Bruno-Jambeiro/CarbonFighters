@@ -11,5 +11,8 @@ router.post('/', authMiddleware, upload.single('image'), (req, res) => actionsCo
 // GET /actions/my-actions - Get user's actions
 router.get('/my-actions', authMiddleware, (req, res) => actionsController.myActions(req, res));
 
+// POST /actions/validate/:id - Validate an action
+router.post('/validate/:id', authMiddleware, (req, res) => actionsController.validate(req, res));
+
 export default router;
 

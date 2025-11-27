@@ -1,7 +1,6 @@
 import express from 'express';
 import authRoutes from './routes/auth.routes';
 import groupRouthes from './routes/group.routes';
-//import actionRoutes from './routes/action.routes';
 import badgeRoutes from './routes/badge.routes';
 import actionsRoutes from './routes/actions.routes';
 import userRoutes from './routes/user.routes';

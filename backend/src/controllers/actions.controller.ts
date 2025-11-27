@@ -3,6 +3,7 @@ import { actionsService } from '../services/actions.services';
 import { AuthRequest } from '../types/AuthRequest';
 import fs from 'fs';
 import path from 'path';
+import { dbRun } from '../services/db.service';
 
 class ActionsController {
     public async create(req: AuthRequest, res: Response) {
@@ -93,6 +94,27 @@ class ActionsController {
             return res.status(200).json(actionsWithBase64);
         } catch (err) {
             console.error('Error listing actions', err);
+            return res.status(500).json({ error: 'Server error' });
+        }
+    }
+
+    public async validate(req: AuthRequest, res: Response) {
+        try {
+            const userId = req.user?.id;
+            if (!userId) return res.status(401).json({ error: 'Unauthorized' });
+
+            const actionId = req.params.id
+            dbRun("UPDATE activities SET validated_by = ? WHERE id = ?;", [userId, actionId])
+
+            return res.sendStatus(200);
+        } catch (err) {
+            console.error('Error updating action', err);
+            // Clean up uploaded file if there was an error
+            if (req.file) {
+                fs.unlink(req.file.path, (unlinkErr) => {
+                    if (unlinkErr) console.error('Error deleting file:', unlinkErr);
+                });
+            }
             return res.status(500).json({ error: 'Server error' });
         }
     }

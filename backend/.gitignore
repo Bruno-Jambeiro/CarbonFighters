@@ -10,3 +10,4 @@ node_modules/
 # Database files
 *.db
 *.sqlite
+data/images/
